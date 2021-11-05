@@ -1,3 +1,5 @@
+set @@sql_mode=ANSI; 
+
 CREATE TABLE IF NOT EXISTS `LINKS`(
    Id INT,
    Imdbid INT,
@@ -24,17 +26,24 @@ CREATE TABLE IF NOT EXISTS `RATINGS`(
 );
 load data infile 'E:/mysql/links.csv'
 into table links
-fields terminated by ',' optionally enclosed by '"' escaped by '"'
-lines terminated by '\r\n';
+fields terminated by ',' optionally enclosed by '"'
+lines terminated by '\r\n'
+IGNORE 1 LINES;
+
 load data infile 'E:/mysql/links_small.csv'
 into table links_small
-fields terminated by ',' optionally enclosed by '"' escaped by '"'
-lines terminated by '\r\n';
+fields terminated by ',' optionally enclosed by '"'
+lines terminated by '\r\n'
+IGNORE 1 LINES;
+
 load data infile 'E:/mysql/ratings_small.csv'
 into table ratings_small
-fields terminated by ',' optionally enclosed by '"' escaped by '"'
-lines terminated by '\r\n';
+fields terminated by ',' optionally enclosed by '"'
+lines terminated by '\r\n'
+IGNORE 1 LINES;
+
 load data infile 'E:/mysql/ratings.csv'
 into table ratings
-fields terminated by ',' optionally enclosed by '"' escaped by '"'
-lines terminated by '\r\n';
+fields terminated by ',' optionally enclosed by '"'
+lines terminated by '\r\n'
+IGNORE 1 LINES;
