@@ -17,6 +17,7 @@ def parse_data(data_filename, data_type, data_index, data_id="id", neglect=None)
                 continue
             datas = eval(read_data[data_index])
             if not isinstance(datas, list) or i in neglect:
+                print(i, read_data)
                 continue
             for data in datas:
                 if header == "":
@@ -31,14 +32,30 @@ def parse_data(data_filename, data_type, data_index, data_id="id", neglect=None)
         print("-----------------------      end " + data_type + " parsing      -------------------------------")
 
 
+def parse_meta_data():
+    neglect = [19730, 29503, 35587]
+    with open("data/movies_metadata.csv", "r", encoding='UTF-8') as data_file:
+        reader = csv.reader(data_file)
+        file = open("parse_files/movies_metadata.csv", "w")
+        writer = csv.writer(file)
+        header = next(reader)
+        writer.writerow(header)
+        for i, data in enumerate(reader):
+            if i in neglect:
+                continue
+            writer.writerow(data)
+        print("-----------------------      end movies_meta_data parsing      -------------------------------")
+
+
 def parse_necessary_data():
-    parse_data("movies_metadata", "genres", 3)
-    parse_data("movies_metadata", "production_companies", 12)
-    parse_data("movies_metadata", "production_countries", 13, "iso_3166_1")
-    parse_data("movies_metadata", "spoken_languages", 17, "iso_639_1")
-    parse_data("credits", "crews", 1)
-    parse_data("credits", "casts", 0)
-    parse_data("keywords", "keywords", 1)
+    # parse_data("movies_metadata", "genres", 3)
+    # parse_data("movies_metadata", "production_companies", 12)
+    # parse_data("movies_metadata", "production_countries", 13, "iso_3166_1")
+    # parse_data("movies_metadata", "spoken_languages", 17, "iso_639_1")
+    # parse_data("credits", "crews", 1)
+    # parse_data("credits", "casts", 0)
+    # parse_data("keywords", "keywords", 1)
+    parse_meta_data()
 
 
 def generate_relations_by_movies_metadata(relation_name, data_type, data_index, data_id, relation, neglect=None):
@@ -158,7 +175,7 @@ print("-----------------------      start data parsing      --------------------
 parse_necessary_data()
 
 print("-----------------------  start relations generating  -------------------------------")
-generate_relations()
+# generate_relations()
 
 print("-----------------------  merge two files  -----------------------------")
-merge_files()
+# merge_files()

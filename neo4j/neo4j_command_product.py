@@ -4,7 +4,7 @@ import csv
 def get_relation_command(fromNode, fromNodeProperty, fromProperty, toNode, toNodeProperty, toProperty,
                          relation, filename):
     print(
-        ':auto using periodic commit 10000 load csv with headers from "file:/' + filename + '" as line match (from:' + fromNode + ' {' + fromNodeProperty + ': line.' + fromProperty + '}),(to:' + toNode + ' {' + toNodeProperty + ':line.' + toProperty + '}) merge (from)-[r:' + relation + '{relation:line.relation}]-(to)')
+        ':auto using periodic commit 100000 load csv with headers from "file:/' + filename + '" as line match (from:' + fromNode + ' {' + fromNodeProperty + ': line.' + fromProperty + '}),(to:' + toNode + ' {' + toNodeProperty + ':line.' + toProperty + '}) merge (from)-[r:' + relation + '{relation:line.relation}]-(to);')
 
 
 def get_add_command(node_name, prefix, filename, excluded_property=[]):
@@ -20,16 +20,16 @@ def get_add_command(node_name, prefix, filename, excluded_property=[]):
                     count = count + 1
                     command_part += ","
         print(
-            ':auto using periodic commit 10000 load csv with headers from "file:/' + filename + '" as line with line create (:' + node_name + ' {' + command_part + '});')
+            ':auto using periodic commit 100000 load csv with headers from "file:/' + filename + '" as line with line create (:' + node_name + ' {' + command_part + '});')
 
 
-get_add_command("movie", 'data/', 'movies_metadata.csv',
+get_add_command("movie", 'parse_files/', 'movies_metadata.csv',
                 ["genres", "production_companies", "production_countries", "spoken_languages", "belongs_to_collection"])
 
 get_add_command("cast", 'parse_files/', "casts.csv")
 get_add_command("crew", 'parse_files/', "crews.csv")
 get_add_command("genre", 'parse_files/', "genres.csv")
-get_add_command("keyword", 'parse_files/', "keywords_new.csv")
+get_add_command("keyword", 'parse_files/', "keywords.csv")
 get_add_command("company", 'parse_files/', "production_companies.csv")
 get_add_command("country", 'parse_files/', "production_countries.csv")
 get_add_command("language", 'parse_files/', "spoken_languages.csv")
