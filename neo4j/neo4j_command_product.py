@@ -4,7 +4,7 @@ import csv
 def get_relation_command(fromNode, fromNodeProperty, fromProperty, toNode, toNodeProperty, toProperty,
                          relation, filename):
     print(
-        ':auto using periodic commit 100000 load csv with headers from "file:/' + filename + '" as line match (from:' + fromNode + ' {' + fromNodeProperty + ': line.' + fromProperty + '}),(to:' + toNode + ' {' + toNodeProperty + ':line.' + toProperty + '}) merge (from)-[r:' + relation + '{relation:line.relation}]-(to);')
+        ':auto using periodic commit 100000 load csv with headers from "file:///' + filename + '" as line match (from:' + fromNode + ' {' + fromNodeProperty + ': line.' + fromProperty + '}),(to:' + toNode + ' {' + toNodeProperty + ':line.' + toProperty + '}) merge (from)-[r:' + relation + '{relation:line.relation}]-(to);')
 
 
 def get_add_command(node_name, prefix, filename, excluded_property=[]):
@@ -15,12 +15,13 @@ def get_add_command(node_name, prefix, filename, excluded_property=[]):
         count = len(excluded_property) + 1
         for property in header:
             if not excluded_property.__contains__(property):
-                command_part += property + ":line." + property
+                command_part += property + ":COALESCE(line." + property + ", \"none\")"
                 if count < len(header):
                     count = count + 1
                     command_part += ","
         print(
-            ':auto using periodic commit 100000 load csv with headers from "file:/' + filename + '" as line with line create (:' + node_name + ' {' + command_part + '});')
+            'using periodic commit 100000 load csv with headers from "file:///' + filename +
+            '" as line with line merge (:' + node_name + ' {' + command_part + '});')
 
 
 get_add_command("movie", 'parse_files/', 'movies_metadata.csv',
