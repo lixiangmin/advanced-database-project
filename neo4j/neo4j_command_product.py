@@ -1,10 +1,10 @@
 import csv
 
 
-def get_relation_command(fromNode, fromNodeProperty, fromProperty, toNode, toNodeProperty, toProperty,
-                         relation, filename):
+def get_relation_command(from_node, from_node_property, from_property, to_node, to_node_property, to_property,
+                         relation, filename, relation_property='relation:line.relation'):
     print(
-        'using periodic commit 100000 load csv with headers from "file:///' + filename + '" as line match (from:' + fromNode + ' {' + fromNodeProperty + ': line.' + fromProperty + '}),(to:' + toNode + ' {' + toNodeProperty + ':line.' + toProperty + '}) merge (from)-[r:' + relation + '{relation:line.relation}]-(to);')
+        'using periodic commit 100000 load csv with headers from "file:///' + filename + '" as line match (from:' + from_node + ' {' + from_node_property + ': line.' + from_property + '}),(to:' + to_node + ' {' + to_node_property + ':line.' + to_property + '}) merge (from)-[r:' + relation + '{' + relation_property + '}]-(to);')
 
 
 def get_add_command(node_name, prefix, filename, excluded_property=[]):
@@ -34,6 +34,7 @@ get_add_command("keyword", 'parse_files/', "keywords.csv")
 get_add_command("company", 'parse_files/', "production_companies.csv")
 get_add_command("country", 'parse_files/', "production_countries.csv")
 get_add_command("language", 'parse_files/', "spoken_languages.csv")
+get_add_command("user", 'parse_files/', "ratings_merged.csv", ["movieId", "rating", "timestamp"])
 
 get_relation_command("movie", "id", "movieId", "genre", "id", "genreId", "BELONG_TO", 'genres_relation.csv')
 get_relation_command("movie", "id", "movieId", "language", "iso_639_1", "languageId", "SPEAK",
@@ -45,3 +46,5 @@ get_relation_command("company", "id", "companyId", "movie", "id", "movieId", "PR
                      "production_companies_relation.csv")
 get_relation_command("country", "iso_3166_1", "countryId", "movie", "id", "movieId", "PRODUCT",
                      "production_countries_relation.csv")
+get_relation_command("user", "userId", "userId", "movie", "id", "movieId", "RANK", 'ratings_merged.csv',
+                     'rating:line.rating,timestamp:line.timestamp')

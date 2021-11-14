@@ -55,13 +55,13 @@ def parse_meta_data():
 
 
 def parse_necessary_data():
-    # parse_data("movies_metadata", "genres", 3)
-    # parse_data("movies_metadata", "production_companies", 12)
-    # parse_data("movies_metadata", "production_countries", 13, "iso_3166_1")
-    # parse_data("movies_metadata", "spoken_languages", 17, "iso_639_1")
-    # parse_data("credits", "crews", 1)
-    # parse_data("credits", "casts", 0)
-    # parse_data("keywords", "keywords", 1)
+    parse_data("movies_metadata", "genres", 3)
+    parse_data("movies_metadata", "production_companies", 12)
+    parse_data("movies_metadata", "production_countries", 13, "iso_3166_1")
+    parse_data("movies_metadata", "spoken_languages", 17, "iso_639_1")
+    parse_data("credits", "crews", 1)
+    parse_data("credits", "casts", 0)
+    parse_data("keywords", "keywords", 1)
     parse_meta_data()
 
 
@@ -132,12 +132,12 @@ def merge(a_file, b_file, int_idx, efficient=False):
     big_file_reader = csv.reader(big_file)
     merged_file = open("parse_files/" + a_file + "_merged.csv", "w", encoding='UTF-8')
     merged_file_writer = csv.writer(merged_file)
-    next(big_file_reader)
+    header = next(big_file_reader)
+    merged_file_writer.writerow(header)
     big_file_data = []
-    for r in big_file_reader:
-        row = r
+    for row in big_file_reader:
         for idx in int_idx:
-            if r[idx] != '':
+            if row[idx] != '':
                 row[idx] = int(row[idx])
         big_file_data.append(row)
     with open("data/" + b_file + ".csv", "r", encoding='UTF-8') as small_file:
@@ -146,30 +146,31 @@ def merge(a_file, b_file, int_idx, efficient=False):
         row_num = row_count("data/" + b_file + ".csv")
         if efficient is False:
             for small_file_data in small_file_reader:
-                row = small_file_data
                 for idx in int_idx:
                     if small_file_data[idx] != '':
-                        row[idx] = int(row[idx])
-                if row not in big_file_data:
-                    big_file_data.append(row)
+                        small_file_data[idx] = int(small_file_data[idx])
+                if small_file_data not in big_file_data:
+                    big_file_data.append(small_file_data)
             big_file_data.sort()
+            merged_file_writer.writerows(big_file_data)
         else:
             row = next(small_file_reader)
             for idx in int_idx:
                 if row[idx] != '':
                     row[idx] = int(row[idx])
             for i, d in enumerate(big_file_data):
-                if d[0] == row[0] and d[1] < row[1]:
-                    continue
-                elif d[0] != row[0] or (d[0] == row[0] and d[1] > row[1]):
-                    d.insert(i, row)
                 if small_file_reader.line_num == row_num:
-                    break
-                row = next(small_file_reader)
-                for idx in int_idx:
-                    if row[idx] != '':
-                        row[idx] = int(row[idx])
-    merged_file_writer.writerows(big_file_data)
+                    merged_file_writer.writerow(d)
+                else:
+                    if d[0] == row[0] and d[1] < row[1]:
+                        merged_file_writer.writerow(d)
+                        continue
+                    elif d[0] != row[0] or (d[0] == row[0] and d[1] > row[1]):
+                        merged_file_writer.writerow(row)
+                    row = next(small_file_reader)
+                    for idx in int_idx:
+                        if row[idx] != '':
+                            row[idx] = int(row[idx])
     print("-----------------------      finish " + a_file + " generating      -------------------------------")
 
 
@@ -180,10 +181,10 @@ def merge_files():
 
 print("-----------------------      start data parsing      -------------------------------")
 
-# parse_necessary_data()
+parse_necessary_data()
 
 print("-----------------------  start relations generating  -------------------------------")
 generate_relations()
 
 print("-----------------------  merge two files  -----------------------------")
-# merge_files()
+merge_files()
