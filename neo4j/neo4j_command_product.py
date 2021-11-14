@@ -4,7 +4,7 @@ import csv
 def get_relation_command(fromNode, fromNodeProperty, fromProperty, toNode, toNodeProperty, toProperty,
                          relation, filename):
     print(
-        ':auto using periodic commit 100000 load csv with headers from "file:///' + filename + '" as line match (from:' + fromNode + ' {' + fromNodeProperty + ': line.' + fromProperty + '}),(to:' + toNode + ' {' + toNodeProperty + ':line.' + toProperty + '}) merge (from)-[r:' + relation + '{relation:line.relation}]-(to);')
+        'using periodic commit 100000 load csv with headers from "file:///' + filename + '" as line match (from:' + fromNode + ' {' + fromNodeProperty + ': line.' + fromProperty + '}),(to:' + toNode + ' {' + toNodeProperty + ':line.' + toProperty + '}) merge (from)-[r:' + relation + '{relation:line.relation}]-(to);')
 
 
 def get_add_command(node_name, prefix, filename, excluded_property=[]):
@@ -36,7 +36,7 @@ get_add_command("country", 'parse_files/', "production_countries.csv")
 get_add_command("language", 'parse_files/', "spoken_languages.csv")
 
 get_relation_command("movie", "id", "movieId", "genre", "id", "genreId", "BELONG_TO", 'genres_relation.csv')
-get_relation_command("movie", "id", "movieId", "language", "iso_639_1", "languageId", "BELONG_TO",
+get_relation_command("movie", "id", "movieId", "language", "iso_639_1", "languageId", "SPEAK",
                      "spoken_languages_relation.csv")
 get_relation_command("cast", "id", "castId", "movie", "id", "movieId", "ACT", "casts_relation.csv")
 get_relation_command("crew", "id", "crewId", "movie", "id", "movieId", "WORK_IN", "crews_relation.csv")

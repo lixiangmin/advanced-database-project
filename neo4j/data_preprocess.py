@@ -40,9 +40,16 @@ def parse_meta_data():
         writer = csv.writer(file)
         header = next(reader)
         writer.writerow(header)
+        idList = []
+        dataList = []
         for i, data in enumerate(reader):
             if i in neglect:
                 continue
+            if data[5] in idList:
+                idx = idList.index(data[5])
+                data = dataList[idx]
+            idList.append(data[5])
+            dataList.append(data)
             writer.writerow(data)
         print("-----------------------      end movies_meta_data parsing      -------------------------------")
 
@@ -71,10 +78,11 @@ def generate_relations_by_movies_metadata(relation_name, data_type, data_index, 
             if len(movie_metadata) != 24 or i in neglect:
                 continue
             movie_id = movie_metadata[5]
-            items = eval(movie_metadata[data_index])
-            for item in items:
-                row = [movie_id, item.get(data_id), relation]
-                writer.writerow(row)
+            if len(movie_metadata[data_index]) != 0:
+                items = eval(movie_metadata[data_index])
+                for item in items:
+                    row = [movie_id, item.get(data_id), relation]
+                    writer.writerow(row)
     print("-----------------------      finish " + relation_name + " generating      -------------------------------")
 
 
@@ -107,8 +115,8 @@ def generate_relations_by_movies_and_extra(relation_name, extra_file_path, extra
 def generate_relations():
     generate_relations_by_movies_metadata("genres_relation", "genre", 3, "id", "belong_to")
     generate_relations_by_movies_metadata("spoken_languages_relation", "language", 17, "iso_639_1", "speak")
-    generate_relations_by_movies_metadata("production_countries_relation", "country", 12, "iso_3166_1", "product")
-    generate_relations_by_movies_metadata("production_companies_relation", "company", 13, "id", "product")
+    generate_relations_by_movies_metadata("production_countries_relation", "country", 13, "iso_3166_1", "product")
+    generate_relations_by_movies_metadata("production_companies_relation", "company", 12, "id", "product")
     generate_relations_by_movies_and_extra("keywords_relation", "data/keywords.csv", "keyword", 1, "id", 0, "describe")
     generate_relations_by_movies_and_extra("crews_relation", "data/credits.csv", "crew", 1, "id", 2, "work_in")
     generate_relations_by_movies_and_extra("casts_relation", "data/credits.csv", "cast", 0, "id", 2, "act")
@@ -172,10 +180,10 @@ def merge_files():
 
 print("-----------------------      start data parsing      -------------------------------")
 
-parse_necessary_data()
+# parse_necessary_data()
 
 print("-----------------------  start relations generating  -------------------------------")
-# generate_relations()
+generate_relations()
 
 print("-----------------------  merge two files  -----------------------------")
 # merge_files()
