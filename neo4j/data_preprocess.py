@@ -154,19 +154,36 @@ def merge(a_file, b_file, int_idx, efficient=False):
             big_file_data.sort()
             merged_file_writer.writerows(big_file_data)
         else:
+            is_small_end = False
             row = next(small_file_reader)
             for idx in int_idx:
                 if row[idx] != '':
                     row[idx] = int(row[idx])
-            for i, d in enumerate(big_file_data):
-                if small_file_reader.line_num == row_num:
+            i = 0
+            while i < len(big_file_data):
+                d = big_file_data[i]
+                if is_small_end:
                     merged_file_writer.writerow(d)
+                    i += 1
                 else:
-                    if d[0] == row[0] and d[1] < row[1]:
+                    if d[0] < row[0] or (d[0] == row[0] and d[1] < row[1]):
                         merged_file_writer.writerow(d)
+                        i += 1
                         continue
-                    elif d[0] != row[0] or (d[0] == row[0] and d[1] > row[1]):
+                    elif d[0] > row[0] or (d[0] == row[0] and d[1] > row[1]):
                         merged_file_writer.writerow(row)
+                        i -= 1
+                    # 处理同一个人对同一部电影的多次评价，取最新的评价
+                    else:
+                        if int(d[3]) > int(row[3]):
+                            merged_file_writer.writerow(d)
+                        else:
+                            merged_file_writer.writerow(row)
+                    i += 1
+                    # 处理small文件里最后一个没有写入的问题
+                    if small_file_reader.line_num == row_num:
+                        is_small_end = True
+                        continue
                     row = next(small_file_reader)
                     for idx in int_idx:
                         if row[idx] != '':
@@ -179,6 +196,12 @@ def merge_files():
     merge("ratings", "ratings_small", [0, 1], efficient=True)
 
 
+def check_num(a_file, b_file):
+    print("big_file_data_num: " + str(row_count("data/" + b_file + ".csv")))
+    print("small_file_data_num: " + str(row_count("data/" + a_file + ".csv")))
+    print("merged_data_num: " + str(row_count("parse_files/" + a_file + "_merged.csv")))
+
+
 print("-----------------------      start data parsing      -------------------------------")
 
 parse_necessary_data()
@@ -188,3 +211,7 @@ generate_relations()
 
 print("-----------------------  merge two files  -----------------------------")
 merge_files()
+
+check_num("links", "links_small")
+check_num("ratings", "ratings_small")
+
