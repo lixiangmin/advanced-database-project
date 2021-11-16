@@ -1,73 +1,74 @@
 import pymongo
 import csv
-import pandas as pd
 import configparser
-import json
+import logging
 
+# config log format
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
-def _process(str):
-    list = str.split('"')
-    if len(list) != 1:
-        for i in range(len(list)):
-            if i % 2 == 0:
-                continue
-            temp1 = list[i]
-            temp2 = list[i]
-
-            temp2=temp2.replace("'", '’')
-            str=str.replace(temp1, temp2)
-    return str
-
-
+# read and load configuration of remote DB
 config = configparser.ConfigParser()
 config.read('config.ini')
 ip = config.get('server', 'ip_addr')
 remote_url = config.get('server', 'remote_url')
+
+# basic DB information definition
 db_name = 'full_movie_lens'
 
-if __name__ == '__main__':
+def _load_credit(mydb):
+    logging.info("Start loading credits...")
+    col = mydb['credit']
 
-    myclient = pymongo.MongoClient(remote_url)
-    mydb = myclient[db_name]
-    mycol = mydb['credit']
-
+    # open CSV file restoring the proprocessed data
     bid_info = csv.DictReader(
         open('./data/credits.csv', 'r', encoding='utf-8-sig'))
-    dict_data = {}
-    i=0
+    
+    # FIXME: the row index control in this function has some bugs, causing printing logs with wrong row data
+    total = 45404
+    i = 2
+
+    # write data to DB row by row
     for lines in bid_info:
         if bid_info.line_num == 1:
             continue
         else:
-            lines['id'] = int(lines['id'])
+            temp_row_data = {}
+
+            # for row in which data is with wrong format that cannot be parsed,
+            # e.g., with id that is not an int value, skip the row
+            try:
+                temp_row_data['crew'] = eval(lines['crew'])
+                temp_row_data['cast'] = eval(lines['cast'])
+                temp_row_data['_id'] = int(lines['id'])
+            except SyntaxError:
+                logging.error(f"Wrong format data: row {i}")
+                i = i+1
+                continue
+
+            # for row in which data has a duplicate key with data written before,
+            # skip the row
+            try:
+                col.insert_one(temp_row_data)
+            except pymongo.errors.DuplicateKeyError:
+                logging.warning(f"Duplicate key: {temp_row_data['_id']} in row {i}")
+                i = i+1                
+                continue
+
+            i = i+1
+            rate = i*100 / total
+            if rate % 5 == 0:
+                logging.info(f"{rate}% finished.")
             
-            lines['cast'] = lines['cast'].replace("None", 'null')
-            temp = lines['cast'].replace("'", '"')
-            try:
-                json.loads(temp)
-            except json.decoder.JSONDecodeError:            
-                str = _process(lines['cast'])
-                lines['cast'] = str.replace("'", '"')
-                json.loads(lines['cast'])
-            else:
-                lines['cast'] = temp
+    logging.info("Credits loading finish...")
 
 
-            lines['crew'] = lines['crew'].replace("None", 'null')
-            temp = lines['crew'].replace("'", '"')
-            try:
-                json.loads(temp)
-            except json.decoder.JSONDecodeError:            
-                str = _process(lines['crew'])
-                lines['crew'] = str.replace("'", '"')
-                json.loads(lines['crew'])
-            else:
-                lines['crew'] = temp
 
-            dict_data['crew']=json.loads( lines['crew'])
-            dict_data['cast']=json.loads( lines['cast'])
-            dict_data['_id']=lines['id']
-     
-            x = mycol.insert_one(dict_data)
-            i=i+1
-            print(f"{i} Done.")
+if __name__ == '__main__':
+    # DB connection
+    myclient = pymongo.MongoClient(remote_url)
+    mydb = myclient[db_name]
+
+    # data loading
+    _load_credit(mydb=mydb)
+    
