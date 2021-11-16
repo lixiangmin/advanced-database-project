@@ -74,8 +74,7 @@ def _load_movie(mydb):
     # open CSV file restoring the proprocessed data
     bid_info = csv.DictReader(
         open('./data/movies_metadata.csv', 'r', encoding='utf-8-sig'))
-    # bid_info = csv.DictReader(
-    #     open('./data/demo.csv', 'r', encoding='utf-8-sig'))
+
     total = 45467
     i = 2
 
@@ -195,6 +194,66 @@ def _load_movie(mydb):
     logging.info("Movie metadata loading finish...")
 
 
+
+
+def _load_keyword(mydb):
+    logging.info("Start loading keywords...")
+    col = mydb['keywords']
+
+    # open CSV file restoring the proprocessed data
+    bid_info = csv.DictReader(
+        open('./data/keywords.csv', 'r', encoding='utf-8-sig'))
+    # bid_info = csv.DictReader(
+    #     open('./data/demo.csv', 'r', encoding='utf-8-sig'))
+    total = 46420
+    i = 2
+
+    # write data to DB row by row
+    for lines in bid_info:
+        if bid_info.line_num == 1:
+            continue
+        else:
+            temp_row_data = {}
+
+            # for row in which data is with wrong format that cannot be parsed,
+            # e.g., with id that is not an int value, skip the row
+            try:
+                if lines['id'] != '' and lines['id'] != None:
+                    temp_row_data['id'] = int(lines['id'])
+
+                if lines['keywords'] != '' and lines['keywords'] != None:
+                    temp_row_data['keywords'] = eval(
+                        lines['keywords'])
+
+            except ValueError:
+                logging.error(f"Wrong format data: row {i}")
+                traceback.print_exc()
+                i = i+1
+                continue
+            except SyntaxError:
+                logging.error(f"Wrong format data: row {i}")
+                traceback.print_exc()
+                i = i+1
+                continue
+
+            # for row in which data has a duplicate key with data written before,
+            # skip the row
+            try:
+                col.insert_one(temp_row_data)
+            except pymongo.errors.DuplicateKeyError:
+                logging.warning(
+                    f"Duplicate key: {temp_row_data['_id']} in row {i}")
+                i = i+1
+                continue
+
+            i = i+1
+            rate = i*100 / total
+            if rate % 2 == 0:
+                logging.info(f"{rate}% finished.")
+
+    logging.info("keywords loading finish...")
+
+
 if __name__ == '__main__':
     # DB connection
     myclient = pymongo.MongoClient(remote_url)
@@ -202,4 +261,5 @@ if __name__ == '__main__':
 
     # data loading
     # _load_credit(mydb=mydb)
-    _load_movie(mydb=mydb)
+    # _load_movie(mydb=mydb)
+    _load_keyword(mydb=mydb)
