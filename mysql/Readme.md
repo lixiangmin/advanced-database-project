@@ -37,5 +37,5 @@
     * `Data[i][key]`表示主表第`i`行`key`字段的`value`
       * 如`Data[0]['id']`
     * `DataJson[Child][i][key]`表示子表`Child`第`i`行`key`字段的`value`
-      * 如`Data['cast'][0]['cast_id']`
+      * 如`DataJson['cast'][0]['cast_id']`
 
