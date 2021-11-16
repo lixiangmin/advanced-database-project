@@ -1,5 +1,6 @@
 set @@sql_mode=ANSI; 
 
+
 CREATE TABLE IF NOT EXISTS `LINKS`(
    Id INT,
    Imdbid INT,
