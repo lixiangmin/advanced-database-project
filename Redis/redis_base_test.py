@@ -26,7 +26,7 @@ def clock(func):
         elapsed = timeit.default_timer() - t0
         name = func.__name__
         arg_str = ', '.join(repr(arg) for arg in args)
-        print('[%0.8fs] %s(%s) -> %r' % (elapsed, name, arg_str, result))
+        print('[%0.8fs] %s(%s) -> %r | avg_latency_ms = %0.8fs | QPS = %0.8fs' % (elapsed, name, arg_str, result, elapsed/int(arg_str),int(arg_str)/elapsed))
         return result
 
     return clocked
