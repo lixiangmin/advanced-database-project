@@ -1,6 +1,4 @@
 import math
-
-import json
 import pandas as pd
 
 from MovieDB import *
@@ -13,11 +11,31 @@ def preCSV(fileName):
             dataList[i][j] = dataList[i][j].replace('\'order\'', '\'_order\'')
             dataList[i][j] = dataList[i][j].replace('\'character\'', '\'_character\'')
     dataset.to_csv('../data/' + fileName + '_new.csv', index=False, sep=',')
+    print(fileName + '.csv preparation finished.')
 
-def importCSV(DB, fileName, colType, priKey, addPriKey=False):
-    dataset = pd.read_csv('../data/' + fileName + '.csv', header=0, encoding='utf-8', dtype=str)
-    cols = dataset.columns
-    dataList = dataset.values
+def exportCSV(Data, colType, fileName):
+    colList = list(colType.keys())
+    dataList = []
+    for item in Data:
+        dataList.append([])
+        for colName in colList:
+                dataList[-1].append(item[colName])
+    test = pd.DataFrame(columns=colList, data=dataList)
+    test.to_csv('./processedData/' + fileName + '.csv', index=None, encoding='utf-8')
+    print(fileName + '.csv export finished.')
+
+def GenSQL(fileName, SQLFile):
+    output = [
+        'load data infile \'/home/lc/Task/Course/DBcourse/src/processedData/' + fileName + '.csv\'',
+        'into table ' + fileName,
+        'fields terminated by \',\' optionally enclosed by \'\"\'',
+        'lines terminated by \'\\n\'',
+        'IGNORE 1 LINES;'
+    ]
+    for item in output:
+        SQLFile.write(item + '\n')
+
+def importCSV(DB, fileName, colType, priKey, addPriKey=False, mergeFile=None, Export2CSV=True, Insert2DB=False, SQLFile=None):
     colTypeFa = {}
     colTypeCh = {}
     for key in colType.keys():
@@ -25,15 +43,35 @@ def importCSV(DB, fileName, colType, priKey, addPriKey=False):
             colTypeFa[key] = colType[key]
         else: # json/json list
             colTypeCh[key] = colType[key]
-    
-    DB.tableCreate(fileName, colTypeFa, priKey)
+
+    autoIdDict = {}
+    DB.tableCreate(fileName, colTypeFa, priKey, SQLFile=SQLFile, executeSQL=Insert2DB)
     for key in colTypeCh.keys():
+        if 'autoId' in colTypeCh[key]['colType']:
+            autoIdDict[key] = 0
         DB.tableCreate(
             tableName=fileName + colTypeCh[key]['name'],
             colType=colTypeCh[key]['colType'],
             priKey=colTypeCh[key]['priKey'],
             autoPriKey=colTypeCh[key]['autoPriKey'],
-            foreignKey={fileName : colTypeCh[key]['foreignKey']})
+            foreignKey={fileName : colTypeCh[key]['foreignKey']},
+            SQLFile=SQLFile,
+            executeSQL=Insert2DB)
+
+    if SQLFile is not None:
+        GenSQL(fileName, SQLFile)
+        for key in colTypeCh.keys():
+            GenSQL(fileName + colTypeCh[key]['name'], SQLFile)
+
+    if not Export2CSV and not Insert2DB:
+        return
+
+    dataset = pd.read_csv('../data/' + fileName + '.csv', header=0, encoding='utf-8', dtype=str)
+    cols = dataset.columns
+    dataList = list(dataset.values)
+    if mergeFile is not None:
+        for file2merge in mergeFile:
+            dataList += list(pd.read_csv('../data/' + file2merge + '.csv', header=0, encoding='utf-8', dtype=str).values)
 
     Data = []
     DataJson = {}
@@ -54,9 +92,12 @@ def importCSV(DB, fileName, colType, priKey, addPriKey=False):
                 if colTypeFa[key] == 'int' or colTypeFa[key] == 'double':
                     if not math.isnan(float(item[key])):
                         data[key] = int(item[key]) if colTypeFa[key] == 'int' else float(item[key])
+                    else:
+                        data[key] = math.nan
                 else:
                     data[key] = str(item[key])
             except:
+                data[key] = None
                 continue
         if addPriKey:
             priId += 1
@@ -66,12 +107,19 @@ def importCSV(DB, fileName, colType, priKey, addPriKey=False):
         if priKey not in data.keys() or data[priKey] in idSet:
             continue
         for key in colTypeCh.keys():
+            if type(item[key]) is not str: #None
+                continue
             if colTypeCh[key]['type'] == 'json':
                 item[key] = '[' + item[key] + ']'
             item[key] = eval(item[key])
-            for dataItem in item[key]:
-                dataItem[fileName + colTypeCh[key]['foreignKey']] = data[colTypeCh[key]['foreignKey']]
-                dataJson[key].append(dataItem)
+            if type(item[key]) is list:
+                for dataItem in item[key]:
+                    if type(dataItem) is dict:
+                        dataItem[fileName + colTypeCh[key]['foreignKey']] = data[colTypeCh[key]['foreignKey']]
+                        if 'autoId' in colTypeCh[key]['colType']:
+                            dataItem['autoId'] = autoIdDict[key]
+                            autoIdDict[key] += 1
+                        dataJson[key].append(dataItem)
 
         idSet.add(data[priKey])
         Data.append(data)
@@ -79,199 +127,245 @@ def importCSV(DB, fileName, colType, priKey, addPriKey=False):
             for item in dataJson[key]:
                 DataJson[key].append(item)
     
-    for idx, item in enumerate(Data):
-        if idx % 1000 == 0:
-            print(idx)
-        DB.tables[fileName].insert(item)
-    for key in colTypeCh.keys():
-        for idx, item in enumerate(DataJson[key]):
+    if Export2CSV:
+        exportCSV(Data, colTypeFa, fileName)
+        for key in colTypeCh.keys():
+            colTypeCh[key]['colType'][fileName + colTypeCh[key]['foreignKey']] = colTypeFa[colTypeCh[key]['foreignKey']]
+            exportCSV(DataJson[key], colTypeCh[key]['colType'], fileName + colTypeCh[key]['name'])
+
+    if Insert2DB:
+        print(fileName + '.csv data insert begin...')
+        for idx, item in enumerate(Data):
             if idx % 1000 == 0:
                 print(idx)
-            DB.tables[fileName + colTypeCh[key]['name']].insert(item)
+            DB.tables[fileName].insert(item)
+        for key in colTypeCh.keys():
+            for idx, item in enumerate(DataJson[key]):
+                if idx % 1000 == 0:
+                    print(idx)
+                DB.tables[fileName + colTypeCh[key]['name']].insert(item)
+        print(fileName + '.csv data insert finished.')
 
 if __name__ == '__main__':
 
     movieDB = MovieDB()
+    SQLFile = open('./create&insert.sql', 'w')
+    SQLFile.write('set @@sql_mode=ANSI;\n')
+    Export2CSV = True
+    Insert2DB = False
+    
+    proMovies_metadata = True
+    proLinks = True
+    proRatings = True
+    proCredits = True
+    proKeywords = True
 
     # movies_metadata
-    importCSV(
-        DB=movieDB,
-        fileName='movies_metadata',
-        colType={
-            'adult' : 'varchar(10)',
-            'belongs_to_collection' : {
-                'type' : 'json',
-                'name' : 'belongs_to_collection',
-                'colType' : {
-                    'id' : 'int',
-                    'name' : 'varchar(100)',
-                    'poster_path' : 'varchar(200)',
-                    'backdrop_path' : 'varchar(200)',
-                    'autoId' : 'int'
+    if proMovies_metadata:
+        importCSV(
+            DB=movieDB,
+            fileName='movies_metadata',
+            colType={
+                'adult' : 'varchar(10)',
+                'belongs_to_collection' : {
+                    'type' : 'json',
+                    'name' : 'belongs_to_collection',
+                    'colType' : {
+                        'id' : 'int',
+                        'name' : 'varchar(100)',
+                        'poster_path' : 'varchar(200)',
+                        'backdrop_path' : 'varchar(200)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
                 },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
-            },
-            'budget' :  'double',
-            'genres' : {
-                'type' : 'list',
-                'name' : 'genres',
-                'colType' : {
-                    'id' : 'int',
-                    'name' : 'varchar(100)',
-                    'autoId' : 'int'
+                'budget' :  'double',
+                'genres' : {
+                    'type' : 'list',
+                    'name' : 'genres',
+                    'colType' : {
+                        'id' : 'int',
+                        'name' : 'varchar(100)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
                 },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
-            },
-            'homepage' : 'varchar(1000)',
-            'id' : 'int',
-            'imdb_id' : 'varchar(10)',
-            'original_language' : 'varchar(5)',
-            'original_title' : 'varchar(200)',
-            'overview' : 'varchar(2000)',
-            'popularity' : 'double',
-            'poster_path' : 'varchar(100)',
-            'production_companies' : {
-                'type' : 'list',
-                'name' : 'production_companies',
-                'colType' : {
-                    'id' : 'int',
-                    'name' : 'varchar(100)',
-                    'autoId' : 'int'
+                'homepage' : 'varchar(1000)',
+                'id' : 'int',
+                'imdb_id' : 'varchar(10)',
+                'original_language' : 'varchar(5)',
+                'original_title' : 'varchar(200)',
+                'overview' : 'varchar(2000)',
+                'popularity' : 'double',
+                'poster_path' : 'varchar(100)',
+                'production_companies' : {
+                    'type' : 'list',
+                    'name' : 'production_companies',
+                    'colType' : {
+                        'id' : 'int',
+                        'name' : 'varchar(100)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
                 },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
-            },
-            'production_countries' : {
-                'type' : 'list',
-                'name' : 'production_countries',
-                'colType' : {
-                    'iso_3166_1' : 'int',
-                    'name' : 'varchar(100)',
-                    'autoId' : 'int'
+                'production_countries' : {
+                    'type' : 'list',
+                    'name' : 'production_countries',
+                    'colType' : {
+                        'iso_3166_1' : 'int',
+                        'name' : 'varchar(100)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
                 },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
-            },
-            'release_date' : 'varchar(15)',
-            'revenue' : 'double',
-            'runtime' : 'double',
-            'spoken_languages' : {
-                'type' : 'list',
-                'name' : 'spoken_languages',
-                'colType' : {
-                    'iso_639_1' : 'varchar(10)',
-                    'name' : 'varchar(100)',
-                    'autoId' : 'int'
+                'release_date' : 'varchar(15)',
+                'revenue' : 'double',
+                'runtime' : 'double',
+                'spoken_languages' : {
+                    'type' : 'list',
+                    'name' : 'spoken_languages',
+                    'colType' : {
+                        'iso_639_1' : 'varchar(10)',
+                        'name' : 'varchar(100)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
                 },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
+                'status' : 'varchar(200)',
+                'tagline' : 'varchar(1000)',
+                'title' : 'varchar(200)',
+                'video' : 'varchar(10)',
+                'vote_average' : 'double',
+                'vote_count' : 'int'
             },
-            'status' : 'varchar(200)',
-            'tagline' : 'varchar(1000)',
-            'title' : 'varchar(200)',
-            'video' : 'varchar(10)',
-            'vote_average' : 'double',
-            'vote_count' : 'int'
-        },
-        priKey='id'
-    )
+            priKey='id',
+            Export2CSV=Export2CSV,
+            Insert2DB=Insert2DB,
+            SQLFile=SQLFile
+        )
 
     # links
-    importCSV(
-        DB=movieDB,
-        fileName='links',
-        colType={
-            'movieId' : 'int',
-            'imdbId' : 'int',
-            'tmdbId' : 'int'
-        },
-        priKey='movieId'
-    )
+    if proLinks:
+        importCSV(
+            DB=movieDB,
+            fileName='links',
+            colType={
+                'movieId' : 'int',
+                'imdbId' : 'int',
+                'tmdbId' : 'int'
+            },
+            priKey='movieId',
+            mergeFile=['links_small'],
+            Export2CSV=Export2CSV,
+            Insert2DB=Insert2DB,
+            SQLFile=SQLFile
+        )
 
     # ratings
-    importCSV(
-        DB=movieDB,
-        fileName='ratings',
-        colType={
-            'userId' : 'int',
-            'movieId' : 'int',
-            'rating' : 'double',
-            'timestamp' : 'bigint',
-            'rId' : 'int'
-        },
-        priKey='rId',
-    )
+    if proRatings:
+        importCSV(
+            DB=movieDB,
+            fileName='ratings',
+            colType={
+                'userId' : 'int',
+                'movieId' : 'int',
+                'rating' : 'double',
+                'timestamp' : 'bigint',
+                'rId' : 'int'
+            },
+            priKey='rId',
+            mergeFile=['ratings_small'],
+            Export2CSV=Export2CSV,
+            Insert2DB=Insert2DB,
+            SQLFile=SQLFile,
+            addPriKey=True
+        )
 
     # credits
-    importCSV(
-        DB=movieDB,
-        fileName='credits_new',
-        colType={
-            'cast' : {
-                'type' : 'list',
-                'name' : 'cast',
-                'colType' : {
-                    'cast_id' : 'int',
-                    '_character' : 'varchar(1000)',
-                    'credit_id' : 'varchar(100)',
-                    'gender' : 'int',
-                    'id' : 'int',
-                    'name' : 'varchar(100)',
-                    '_order' : 'int',
-                    'profile_path' : 'varchar(100)',
-                    'autoId' : 'int'
+    if proCredits:
+        preCSV('credits')
+        importCSV(
+            DB=movieDB,
+            fileName='credits_new',
+            colType={
+                'cast' : {
+                    'type' : 'list',
+                    'name' : 'cast',
+                    'colType' : {
+                        'cast_id' : 'int',
+                        '_character' : 'varchar(1000)',
+                        'credit_id' : 'varchar(100)',
+                        'gender' : 'int',
+                        'id' : 'int',
+                        'name' : 'varchar(100)',
+                        '_order' : 'int',
+                        'profile_path' : 'varchar(100)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
                 },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
-            },
-            'crew' : {
-                'type' : 'list',
-                'name' : 'crew',
-                'colType' : {
-                    'credit_id' : 'varchar(1000)',
-                    'department' : 'varchar(100)',
-                    'gender' : 'int',
-                    'id' : 'int',
-                    'job' : 'varchar(100)',
-                    'name' : 'varchar(100)',
-                    'profile_path' : 'varchar(100)',
-                    'autoId' : 'int'
+                'crew' : {
+                    'type' : 'list',
+                    'name' : 'crew',
+                    'colType' : {
+                        'credit_id' : 'varchar(1000)',
+                        'department' : 'varchar(100)',
+                        'gender' : 'int',
+                        'id' : 'int',
+                        'job' : 'varchar(100)',
+                        'name' : 'varchar(100)',
+                        'profile_path' : 'varchar(100)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
                 },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
+                'id' : 'int'
             },
-            'id' : 'int'
-        },
-        priKey='id'
-    )
+            priKey='id',
+            Export2CSV=Export2CSV,
+            Insert2DB=Insert2DB,
+            SQLFile=SQLFile
+        )
 
     # keywords
-    importCSV(
-        DB=movieDB,
-        fileName='keywords',
-        colType={
-            'id' : 'int',
-            'keywords' : {
-                'type' : 'list',
-                'name' : 'keywords',
-                'colType' : {
-                    'id' : 'int',
-                    'name' : 'varchar(100)',
-                    'autoId' : 'int'
-                },
-                'autoPriKey' : True,
-                'priKey' : 'autoId',
-                'foreignKey' : 'id'
-            }
-        },
-        priKey='id'
-    )
+    if proKeywords:
+        importCSV(
+            DB=movieDB,
+            fileName='keywords',
+            colType={
+                'id' : 'int',
+                'keywords' : {
+                    'type' : 'list',
+                    'name' : 'keywords',
+                    'colType' : {
+                        'id' : 'int',
+                        'name' : 'varchar(100)',
+                        'autoId' : 'int'
+                    },
+                    'autoPriKey' : False,
+                    'priKey' : 'autoId',
+                    'foreignKey' : 'id'
+                }
+            },
+            priKey='id',
+            Export2CSV=Export2CSV,
+            Insert2DB=Insert2DB,
+            SQLFile=SQLFile
+        )
+
+    if SQLFile is not None:
+        SQLFile.close()

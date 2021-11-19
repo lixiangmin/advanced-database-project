@@ -2,7 +2,7 @@ import pymysql
 import json
 
 class DBTable():
-    def __init__(self, Name, colName, colType, priKey, DB=None, autoPriKey=False, foreignKey=None):
+    def __init__(self, Name, colName, colType, priKey, DB=None, autoPriKey=False, foreignKey=None, SQLFile=None, executeSQL=True):
         super(DBTable, self).__init__()
         self.Name = Name
         self.colName = colName
@@ -11,6 +11,8 @@ class DBTable():
         self.autoPriKey = autoPriKey
         self.foreignKey = foreignKey
         self.DB = DB
+        self.SQLFile = SQLFile
+        self.executeSQL = executeSQL
         if DB is not None:
             self.create()
 
@@ -25,9 +27,11 @@ class DBTable():
         foreignSql = ''
         if self.foreignKey is not None:
             FaName = list(self.foreignKey.keys())[0]
-            foreignSql = ',' + FaName + self.foreignKey[FaName] + ' int not null, foreign key fk_' + FaName + '(' + FaName + self.foreignKey[FaName] + ') references ' + FaName + '(' + self.foreignKey[FaName] + ') ON UPDATE CASCADE ON DELETE RESTRICT'
+            foreignSql = ',' + FaName + self.foreignKey[FaName] + ' int not null, foreign key fk_' + FaName + '(' + FaName + self.foreignKey[FaName] + ') references ' + FaName + '(' + self.foreignKey[FaName] + ')'#') ON UPDATE CASCADE ON DELETE RESTRICT'
         sql = sql[:-1]
         sql += foreignSql + ')engine=InnoDB default charset=utf8;'
+        if self.SQLFile is not None:
+            self.SQLFile.write(sql + '\n')
         self.DB.execute(sql)
 
     def data2str(self, data, div):
@@ -89,22 +93,25 @@ class DBTable():
         self.DB.execute(sql)
 
 class MovieDB():
-    def __init__(self, Host='localhost', User='root', Password='123456', Database='movieDB', Port=3306, Debug=False):
+    def __init__(self, Host='localhost', User='root', Password='123456', Database='movieDB', Port=3306, Debug=False, executeSQL=True):
         super(MovieDB, self).__init__()
-        self.connect(Host, User, Password, Database, Port)
+        self.executeSQL = executeSQL
+        if executeSQL:
+            self.connect(Host, User, Password, Database, Port)
         self.DEBUG = Debug
         if Debug:
             self.sqlLog = open('./sqlCommandTrace.log', 'w')
         self.tables = {}
     
     def execute(self, sql, requestRet=False, data=None):
+        if not self.executeSQL:
+            return
         if self.DEBUG:
             self.sqlLog.write(sql + '\n')
         if data is not None:
             self.cursor.execute(sql, data)
             self.commit()
             return
-            
         self.cursor.execute(sql)
         if requestRet:
             ret = self.cursor.fetchall()
@@ -116,9 +123,9 @@ class MovieDB():
         except:
             self.db.rollback()
 
-    def tableCreate(self, tableName, colType, priKey, autoPriKey=False, foreignKey=None):
-        self.tables[tableName] = DBTable(tableName, list(colType.keys()), colType, priKey, self, autoPriKey, foreignKey)
-    
+    def tableCreate(self, tableName, colType, priKey, autoPriKey=False, foreignKey=None, SQLFile=None, executeSQL=True):
+        self.tables[tableName] = DBTable(tableName, list(colType.keys()), colType, priKey, self, autoPriKey, foreignKey, SQLFile=SQLFile, executeSQL=executeSQL)
+
     def delete(self):
         tableFa = None
         for table in self.tables.keys():
