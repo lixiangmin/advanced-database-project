@@ -31,6 +31,7 @@ def _load_credit(mydb):
     total = 45404
     i = 2
 
+    result=[]
     # write data to DB row by row
     for lines in bid_info:
         if bid_info.line_num == 1:
@@ -194,8 +195,6 @@ def _load_movie(mydb):
     logging.info("Movie metadata loading finish...")
 
 
-
-
 def _load_keyword(mydb):
     logging.info("Start loading keywords...")
     col = mydb['keywords']
@@ -254,12 +253,122 @@ def _load_keyword(mydb):
     logging.info("keywords loading finish...")
 
 
+def _load_link(mydb):
+    logging.info("Start loading links...")
+    col = mydb['links']
+
+    # open CSV file restoring the proprocessed data
+    bid_info = csv.DictReader(
+        open('./parse_files/links_merged.csv', 'r', encoding='utf-8-sig'))
+    # bid_info = csv.DictReader(
+    #     open('./data/demo.csv', 'r', encoding='utf-8-sig'))
+    total = 45853
+    i = 1
+
+    # write data to DB row by row
+    for lines in bid_info:
+        if bid_info.line_num == 1:
+            continue
+        else:
+            temp_row_data = {}
+
+            # for row in which data is with wrong format that cannot be parsed,
+            # e.g., with id that is not an int value, skip the row
+            try:
+                if lines['movieId'] != '' and lines['movieId'] != None:
+                    temp_row_data['movieId'] = int(lines['movieId'])
+                if lines['imdbId'] != '' and lines['imdbId'] != None:
+                    temp_row_data['imdbId'] = int(lines['imdbId'])
+                if lines['tmdbId'] != '' and lines['tmdbId'] != None:
+                    temp_row_data['tmdbId'] = int(lines['tmdbId'])                    
+            except ValueError:
+                logging.error(f"Wrong format data: row {i}")
+                traceback.print_exc()
+                i = i+1
+                continue
+            except SyntaxError:
+                logging.error(f"Wrong format data: row {i}")
+                traceback.print_exc()
+                i = i+1
+                continue
+
+            # for row in which data has a duplicate key with data written before,
+            # skip the row
+            col.insert_one(temp_row_data)
+
+            i = i+1
+            rate = i*100 / total
+            if rate % 2 == 0:
+                logging.info(f"{rate}% finished.")
+
+    logging.info("links loading finish...")
+
+def _load_rating(mydb):
+    logging.info("Start loading ratings...")
+    col = mydb['ratings']
+
+    # open CSV file restoring the proprocessed data
+    bid_info = csv.DictReader(
+        open('./parse_files/ratings_merged.csv', 'r', encoding='utf-8-sig'))
+    # bid_info = csv.DictReader(
+    #     open('./data/demo.csv', 'r', encoding='utf-8-sig'))
+    total = 45853
+    i = 2
+    
+    # write data to DB row by row
+    for lines in bid_info:
+        if bid_info.line_num == 1:
+            continue
+        else:
+            temp_row_data = {}
+
+            # for row in which data is with wrong format that cannot be parsed,
+            # e.g., with id that is not an int value, skip the row
+            try:
+                if lines['userId'] != '' and lines['userId'] != None:
+                    temp_row_data['userId'] = int(lines['userId'])
+                if lines['movieId'] != '' and lines['movieId'] != None:
+                    temp_row_data['movieId'] = int(lines['movieId'])
+                if lines['rating'] != '' and lines['rating'] != None:
+                    temp_row_data['rating'] = float(lines['rating'])  
+                if lines['timestamp'] != '' and lines['timestamp'] != None:
+                    temp_row_data['timestamp'] = int(lines['timestamp'])                                        
+            except ValueError:
+                logging.error(f"Wrong format data: row {i}")
+                traceback.print_exc()
+                i = i+1
+                continue
+            except SyntaxError:
+                logging.error(f"Wrong format data: row {i}")
+                traceback.print_exc()
+                i = i+1
+                continue
+
+            try:
+                col.insert_one(temp_row_data)
+            except pymongo.errors.DuplicateKeyError:
+                logging.warning(
+                    f"Duplicate key: {temp_row_data['_id']} in row {i}")
+                i = i+1
+                continue
+
+
+            i = i+1
+            rate = i*100 / total
+            if rate % 2 == 0:
+                logging.info(f"{rate}% finished.")
+
+    logging.info("links loading finish...")
+
+
 if __name__ == '__main__':
     # DB connection
     myclient = pymongo.MongoClient(remote_url)
     mydb = myclient[db_name]
 
     # data loading
-    # _load_credit(mydb=mydb)
+    _load_credit(mydb=mydb)
     # _load_movie(mydb=mydb)
-    _load_keyword(mydb=mydb)
+    # _load_keyword(mydb=mydb)
+    # _load_link(mydb=mydb)
+    # _load_rating(mydb=mydb)

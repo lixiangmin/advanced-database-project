@@ -40,21 +40,28 @@ def parse_meta_data():
         writer = csv.writer(file)
         header = next(reader)
         writer.writerow(header)
+        idList = []
+        dataList = []
         for i, data in enumerate(reader):
             if i in neglect:
                 continue
+            if data[5] in idList:
+                idx = idList.index(data[5])
+                data = dataList[idx]
+            idList.append(data[5])
+            dataList.append(data)
             writer.writerow(data)
         print("-----------------------      end movies_meta_data parsing      -------------------------------")
 
 
 def parse_necessary_data():
-    # parse_data("movies_metadata", "genres", 3)
-    # parse_data("movies_metadata", "production_companies", 12)
-    # parse_data("movies_metadata", "production_countries", 13, "iso_3166_1")
-    # parse_data("movies_metadata", "spoken_languages", 17, "iso_639_1")
-    # parse_data("credits", "crews", 1)
-    # parse_data("credits", "casts", 0)
-    # parse_data("keywords", "keywords", 1)
+    parse_data("movies_metadata", "genres", 3)
+    parse_data("movies_metadata", "production_companies", 12)
+    parse_data("movies_metadata", "production_countries", 13, "iso_3166_1")
+    parse_data("movies_metadata", "spoken_languages", 17, "iso_639_1")
+    parse_data("credits", "crews", 1)
+    parse_data("credits", "casts", 0)
+    parse_data("keywords", "keywords", 1)
     parse_meta_data()
 
 
@@ -71,10 +78,11 @@ def generate_relations_by_movies_metadata(relation_name, data_type, data_index, 
             if len(movie_metadata) != 24 or i in neglect:
                 continue
             movie_id = movie_metadata[5]
-            items = eval(movie_metadata[data_index])
-            for item in items:
-                row = [movie_id, item.get(data_id), relation]
-                writer.writerow(row)
+            if len(movie_metadata[data_index]) != 0:
+                items = eval(movie_metadata[data_index])
+                for item in items:
+                    row = [movie_id, item.get(data_id), relation]
+                    writer.writerow(row)
     print("-----------------------      finish " + relation_name + " generating      -------------------------------")
 
 
@@ -107,8 +115,8 @@ def generate_relations_by_movies_and_extra(relation_name, extra_file_path, extra
 def generate_relations():
     generate_relations_by_movies_metadata("genres_relation", "genre", 3, "id", "belong_to")
     generate_relations_by_movies_metadata("spoken_languages_relation", "language", 17, "iso_639_1", "speak")
-    generate_relations_by_movies_metadata("production_countries_relation", "country", 12, "iso_3166_1", "product")
-    generate_relations_by_movies_metadata("production_companies_relation", "company", 13, "id", "product")
+    generate_relations_by_movies_metadata("production_countries_relation", "country", 13, "iso_3166_1", "product")
+    generate_relations_by_movies_metadata("production_companies_relation", "company", 12, "id", "product")
     generate_relations_by_movies_and_extra("keywords_relation", "data/keywords.csv", "keyword", 1, "id", 0, "describe")
     generate_relations_by_movies_and_extra("crews_relation", "data/credits.csv", "crew", 1, "id", 2, "work_in")
     generate_relations_by_movies_and_extra("casts_relation", "data/credits.csv", "cast", 0, "id", 2, "act")
@@ -124,12 +132,12 @@ def merge(a_file, b_file, int_idx, efficient=False):
     big_file_reader = csv.reader(big_file)
     merged_file = open("parse_files/" + a_file + "_merged.csv", "w", encoding='UTF-8')
     merged_file_writer = csv.writer(merged_file)
-    next(big_file_reader)
+    header = next(big_file_reader)
+    merged_file_writer.writerow(header)
     big_file_data = []
-    for r in big_file_reader:
-        row = r
+    for row in big_file_reader:
         for idx in int_idx:
-            if r[idx] != '':
+            if row[idx] != '':
                 row[idx] = int(row[idx])
         big_file_data.append(row)
     with open("data/" + b_file + ".csv", "r", encoding='UTF-8') as small_file:
@@ -138,36 +146,60 @@ def merge(a_file, b_file, int_idx, efficient=False):
         row_num = row_count("data/" + b_file + ".csv")
         if efficient is False:
             for small_file_data in small_file_reader:
-                row = small_file_data
                 for idx in int_idx:
                     if small_file_data[idx] != '':
-                        row[idx] = int(row[idx])
-                if row not in big_file_data:
-                    big_file_data.append(row)
+                        small_file_data[idx] = int(small_file_data[idx])
+                if small_file_data not in big_file_data:
+                    big_file_data.append(small_file_data)
             big_file_data.sort()
+            merged_file_writer.writerows(big_file_data)
         else:
+            is_small_end = False
             row = next(small_file_reader)
             for idx in int_idx:
                 if row[idx] != '':
                     row[idx] = int(row[idx])
-            for i, d in enumerate(big_file_data):
-                if d[0] == row[0] and d[1] < row[1]:
-                    continue
-                elif d[0] != row[0] or (d[0] == row[0] and d[1] > row[1]):
-                    d.insert(i, row)
-                if small_file_reader.line_num == row_num:
-                    break
-                row = next(small_file_reader)
-                for idx in int_idx:
-                    if row[idx] != '':
-                        row[idx] = int(row[idx])
-    merged_file_writer.writerows(big_file_data)
+            i = 0
+            while i < len(big_file_data):
+                d = big_file_data[i]
+                if is_small_end:
+                    merged_file_writer.writerow(d)
+                    i += 1
+                else:
+                    if d[0] < row[0] or (d[0] == row[0] and d[1] < row[1]):
+                        merged_file_writer.writerow(d)
+                        i += 1
+                        continue
+                    elif d[0] > row[0] or (d[0] == row[0] and d[1] > row[1]):
+                        merged_file_writer.writerow(row)
+                        i -= 1
+                    # 处理同一个人对同一部电影的多次评价，取最新的评价
+                    else:
+                        if int(d[3]) > int(row[3]):
+                            merged_file_writer.writerow(d)
+                        else:
+                            merged_file_writer.writerow(row)
+                    i += 1
+                    # 处理small文件里最后一个没有写入的问题
+                    if small_file_reader.line_num == row_num:
+                        is_small_end = True
+                        continue
+                    row = next(small_file_reader)
+                    for idx in int_idx:
+                        if row[idx] != '':
+                            row[idx] = int(row[idx])
     print("-----------------------      finish " + a_file + " generating      -------------------------------")
 
 
 def merge_files():
     merge("links", "links_small", [0, 1, 2])
     merge("ratings", "ratings_small", [0, 1], efficient=True)
+
+
+def check_num(a_file, b_file):
+    print("big_file_data_num: " + str(row_count("data/" + b_file + ".csv")))
+    print("small_file_data_num: " + str(row_count("data/" + a_file + ".csv")))
+    print("merged_data_num: " + str(row_count("parse_files/" + a_file + "_merged.csv")))
 
 
 print("-----------------------      start data parsing      -------------------------------")
@@ -179,3 +211,7 @@ print("-----------------------  start relations generating  --------------------
 
 print("-----------------------  merge two files  -----------------------------")
 merge_files()
+
+# check_num("links", "links_small")
+# check_num("ratings", "ratings_small")
+
