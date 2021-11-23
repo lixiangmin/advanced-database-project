@@ -39,3 +39,26 @@
     * `DataJson[Child][i][key]`表示子表`Child`第`i`行`key`字段的`value`
       * 如`DataJson['cast'][0]['cast_id']`
 
+## Docker
+
+* 需要`processedData`文件夹已经在目录中生成！
+
+```
+docker build -t mysql-image .
+docker run --cpus 4 --memory 8g --name mysql-container -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql-image
+docker exec -it mysql-container /bin/bash
+mysql -u root -p
+123456
+```
+
+* 插入所有表
+
+  `source create&insert.sql`
+
+* 测试
+
+  按照`wiki`中给出的测试`sql`语句执行即可
+
+* 删除所有表
+
+  `source delete.sql`

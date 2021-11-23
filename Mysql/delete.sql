@@ -1,0 +1,13 @@
+drop table movies_metadatabelongs_to_collection;
+drop table movies_metadatagenres;
+drop table movies_metadataproduction_companies;
+drop table movies_metadataproduction_countries;
+drop table movies_metadataspoken_languages;
+drop table movies_metadata;
+drop table links;
+drop table ratings;
+drop table credits_newcast;
+drop table credits_newcrew;
+drop table credits_new;
+drop table keywordskeywords;
+drop table keywords;
