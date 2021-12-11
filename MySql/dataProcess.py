@@ -1,3 +1,4 @@
+import os
 import math
 import pandas as pd
 
@@ -19,13 +20,24 @@ def exportCSV(Data, colType, fileName):
     for item in Data:
         dataList.append([])
         for colName in colList:
-                dataList[-1].append(item[colName])
+            dataList[-1].append(item[colName])
     test = pd.DataFrame(columns=colList, data=dataList)
+    '''
+    # debug code
+    if fileName == 'movies_metadataspoken_languages':
+        print(list(test.values)[506])
+        print(list(test.values)[507])
+        print(list(test.values)[508])
+    '''
+    if not os.path.exists('./processedData'):
+        os.makedirs('./processedData')
     test.to_csv('./processedData/' + fileName + '.csv', index=None, encoding='utf-8')
     print(fileName + '.csv export finished.')
 
 def GenSQL(fileName, SQLFile):
     output = [
+        '',
+        'select \'insert ' + fileName + ' : \';',
         'load data infile \'/home/lc/Task/Course/DBcourse/src/processedData/' + fileName + '.csv\'',
         'into table ' + fileName,
         'fields terminated by \',\' optionally enclosed by \'\"\'',
@@ -104,7 +116,7 @@ def importCSV(DB, fileName, colType, priKey, addPriKey=False, mergeFile=None, Ex
             data[priKey] = priId
             Data.append(data)
             continue
-        if priKey not in data.keys() or data[priKey] in idSet:
+        if priKey not in data.keys() or data[priKey] in idSet or data[priKey] is None or data[priKey] == math.nan:
             continue
         for key in colTypeCh.keys():
             if type(item[key]) is not str: #None
@@ -116,6 +128,11 @@ def importCSV(DB, fileName, colType, priKey, addPriKey=False, mergeFile=None, Ex
                 for dataItem in item[key]:
                     if type(dataItem) is dict:
                         dataItem[fileName + colTypeCh[key]['foreignKey']] = data[colTypeCh[key]['foreignKey']]
+                        '''
+                        # debug code
+                        if data[colTypeCh[key]['foreignKey']] == 0 or data[colTypeCh[key]['foreignKey']] is None or data[colTypeCh[key]['foreignKey']] is math.nan:
+                            print(data[colTypeCh[key]['foreignKey']])
+                        '''
                         if 'autoId' in colTypeCh[key]['colType']:
                             dataItem['autoId'] = autoIdDict[key]
                             autoIdDict[key] += 1
@@ -126,6 +143,16 @@ def importCSV(DB, fileName, colType, priKey, addPriKey=False, mergeFile=None, Ex
         for key in colTypeCh.keys():
             for item in dataJson[key]:
                 DataJson[key].append(item)
+
+    '''
+    # debug code
+    # print(DataJson['spoken_languages'][507])
+    # print(Data[126])
+    for idx in range(1000):
+        if Data[19000 + idx]['imdb_id'] == 'tt0113002':
+            print(Data[19000 + idx])
+            print(Data[19001 + idx])
+    '''
     
     if Export2CSV:
         exportCSV(Data, colTypeFa, fileName)
@@ -150,7 +177,10 @@ if __name__ == '__main__':
 
     movieDB = MovieDB()
     SQLFile = open('./create&insert.sql', 'w')
-    SQLFile.write('set @@sql_mode=ANSI;\n')
+    SQLFile.write('set @@sql_mode=ANSI;\n\n')
+    SQLFile.write('create database movieDB character set utf8;\n')
+    SQLFile.write('use movieDB;\n\n')
+
     Export2CSV = True
     Insert2DB = False
     
@@ -207,7 +237,7 @@ if __name__ == '__main__':
                     'name' : 'production_companies',
                     'colType' : {
                         'id' : 'int',
-                        'name' : 'varchar(100)',
+                        'name' : 'varchar(150)',
                         'autoId' : 'int'
                     },
                     'autoPriKey' : False,
@@ -218,7 +248,7 @@ if __name__ == '__main__':
                     'type' : 'list',
                     'name' : 'production_countries',
                     'colType' : {
-                        'iso_3166_1' : 'int',
+                        'iso_3166_1' : 'varchar(10)',
                         'name' : 'varchar(100)',
                         'autoId' : 'int'
                     },
