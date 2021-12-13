@@ -1,9 +1,11 @@
 README.md
+
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-
+### don't upload sql file ###
+*.sql
 ### STS ###
 .apt_generated
 .classpath
