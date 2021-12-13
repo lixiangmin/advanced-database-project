@@ -9,6 +9,8 @@
 - sql文件：resource/static下面
     - databaseCreate.sql创建表
     - 使用sql文件初始化数据库
+      - 链接: https://pan.baidu.com/s/16-sii5pdHckfaOcDrTNs0A 
+      - 提取码: 88wv
     - 利用neo4j中生成parse_files和relations文件夹中的文件进行数据库初始化
         - parse_files中csv文件对应数据库中各个实体
         - relations中csv文件对应数据库中关系表，导入时，不使用relations的csv中的relation字段，仅使用相关的实体id。
