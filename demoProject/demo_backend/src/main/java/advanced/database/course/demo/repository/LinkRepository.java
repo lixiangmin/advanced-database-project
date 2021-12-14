@@ -1,0 +1,22 @@
+package advanced.database.course.demo.repository;
+
+
+import java.lang.Integer;
+
+import advanced.database.course.demo.entity.Link;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+/**
+ * 持久层
+ *
+ * @author lixiangmin
+ * @since 2021-12-13 13:00:01
+ */
+@Repository
+public interface LinkRepository extends JpaRepository<Link, Integer> {
+    void deleteById(Integer id);
+
+    Link findOneById(Integer id);
+}
+
