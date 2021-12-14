@@ -240,21 +240,23 @@ def parse_data_neo4j_import(data_filename, output_filename, int_idxs, float_idxs
                         continue
                     sub_d.append(data)
                 d.append(sub_d)
-                print(i)
+                # print(i)
+        # d = [[i] for i in sorted(list(set(d)))]
+        # print(len(d))
         writer.writerows(d)
 
-    print("-----------------------  finish" + data_filename + "data parsing for neo4j import  -----------------------")
+    print("-----------------------  finish " + data_filename + "data parsing for neo4j import  -----------------------")
 
 
 def parse_necessary_data_neo4j_import():
-    # parse_data_neo4j_import("movies_metadata", "movies_metadata_neo4j_import", [2, 15, 16, 23], [10, 22], [1, 3, 12, 13, 17], "MOVIE-ID", "id")
-    # parse_data_neo4j_import("casts", "casts_neo4j_import", [0, 3, 6], [], [], "CAST-ID", "id")
-    # parse_data_neo4j_import("production_companies", "production_companies_neo4j_import", [], [], [], "COMPANY-ID", "id")
-    # parse_data_neo4j_import("production_countries", "production_countries_neo4j_import", [], [], [], "COUNTRY-ID", "iso_3166_1")
-    # parse_data_neo4j_import("crews", "crews_neo4j_import", [2], [], [], "CREW-ID", "id")
-    # parse_data_neo4j_import("genres", "genres_neo4j_import", [], [], [], "GENRE-ID", "id")
-    # parse_data_neo4j_import("keywords", "keywords_neo4j_import", [], [], [], "KEYWORD-ID", "id")
-    # parse_data_neo4j_import("spoken_languages", "spoken_languages_neo4j_import", [], [], [], "LANGUAGE-ID", "iso_639_1")
+    parse_data_neo4j_import("movies_metadata", "movies_metadata_neo4j_import", [2, 15, 16, 23], [10, 22], [1, 3, 12, 13, 17], "MOVIE-ID", "id")
+    parse_data_neo4j_import("casts", "casts_neo4j_import", [0, 3, 6], [], [], "CAST-ID", "id")
+    parse_data_neo4j_import("production_companies", "production_companies_neo4j_import", [], [], [], "COMPANY-ID", "id")
+    parse_data_neo4j_import("production_countries", "production_countries_neo4j_import", [], [], [], "COUNTRY-ID", "iso_3166_1")
+    parse_data_neo4j_import("crews", "crews_neo4j_import", [2], [], [], "CREW-ID", "id")
+    parse_data_neo4j_import("genres", "genres_neo4j_import", [], [], [], "GENRE-ID", "id")
+    parse_data_neo4j_import("keywords", "keywords_neo4j_import", [], [], [], "KEYWORD-ID", "id")
+    parse_data_neo4j_import("spoken_languages", "spoken_languages_neo4j_import", [], [], [], "LANGUAGE-ID", "iso_639_1")
     parse_data_neo4j_import("ratings_merged", "user_neo4j_import", [], [], [1, 2, 3], "USER-ID", "userId", parse_primary_key=True)
 
 
@@ -289,31 +291,31 @@ def generate_relations_neo4j_import(data_filename, output_filename, start_id, en
                         continue
                     d.append(data)
                 writer.writerow(d)
-                print(i)
+                # print(i)
 
     print("-----------------------  finish " + data_filename + "relation parsing for neo4j import  -----------------------")
 
 
 def generate_relations_neo4j_import_batch():
-    # generate_relations_neo4j_import("casts_relation", "casts_relation_neo4j_import", "castId", "movieId", "CAST-ID", "MOVIE-ID", [], [], [])
-    # generate_relations_neo4j_import("crews_relation", "crews_relation_neo4j_import", "crewId", "movieId", "CREW-ID", "MOVIE-ID", [], [], [])
-    # generate_relations_neo4j_import("genres_relation", "genres_relation_neo4j_import", "movieId", "genreId", "MOVIE-ID", "GENRE-ID", [], [], [])
-    # generate_relations_neo4j_import("keywords_relation", "keywords_relation_neo4j_import", "keywordId", "movieId", "KEYWORD-ID", "MOVIE-ID", [], [], [])
-    # generate_relations_neo4j_import("production_companies_relation", "production_companies_relation_neo4j_import", "companyId", "movieId", "COMPANY-ID", "MOVIE-ID", [], [], [])
-    # generate_relations_neo4j_import("production_countries_relation", "production_countries_relation_neo4j_import", "countryId", "movieId", "COUNTRY-ID", "MOVIE-ID", [], [], [])
-    # generate_relations_neo4j_import("spoken_languages_relation", "spoken_languages_relation_neo4j_import", "movieId", "languageId", "MOVIE-ID", "LANGUAGE-ID", [], [], [])
+    generate_relations_neo4j_import("casts_relation", "casts_relation_neo4j_import", "castId", "movieId", "CAST-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("crews_relation", "crews_relation_neo4j_import", "crewId", "movieId", "CREW-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("genres_relation", "genres_relation_neo4j_import", "movieId", "genreId", "MOVIE-ID", "GENRE-ID", [], [], [])
+    generate_relations_neo4j_import("keywords_relation", "keywords_relation_neo4j_import", "keywordId", "movieId", "KEYWORD-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("production_companies_relation", "production_companies_relation_neo4j_import", "companyId", "movieId", "COMPANY-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("production_countries_relation", "production_countries_relation_neo4j_import", "countryId", "movieId", "COUNTRY-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("spoken_languages_relation", "spoken_languages_relation_neo4j_import", "movieId", "languageId", "MOVIE-ID", "LANGUAGE-ID", [], [], [])
     generate_relations_neo4j_import("ratings_merged", "ratings_merged_neo4j_import", "userId", "movieId", "USER-ID", "MOVIE-ID", [3], [2], [], dir="parse_files/")
 
 
 print("-----------------------      start data parsing      -------------------------------")
 
-# parse_necessary_data()
+parse_necessary_data()
 
 print("-----------------------  start relations generating  -------------------------------")
-# generate_relations()
+generate_relations()
 
 print("-----------------------  merge two files  -----------------------------")
-# merge_files()
+merge_files()
 
 print("-----------------------  start data parsing for neo4j import  -----------------------------")
 parse_necessary_data_neo4j_import()
