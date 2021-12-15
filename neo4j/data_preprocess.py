@@ -291,6 +291,112 @@ def scrape_api(url):
     except requests.RequestException:
         return None
 
+def parse_data_neo4j_import(data_filename, output_filename, int_idxs, float_idxs, ignore_idxs, primary_key_name, primary_key="id", parse_primary_key=False):
+    with open("parse_files/" + data_filename + ".csv", "r", encoding='UTF-8') as data_file:
+        reader = csv.reader(data_file)
+        file = open("parse_neo4j_import_files/" + output_filename + ".csv", "w")
+        writer = csv.writer(file)
+        primary_key_idx = 0
+        primary_keys = []
+        header = []
+        d = []
+        for i, read_data in enumerate(reader):
+            if i == 0:
+                for j, head in enumerate(read_data):
+                    if j in ignore_idxs:
+                        continue
+                    if head == primary_key:
+                        primary_key_idx = j
+                        header.append(primary_key + ":ID(" + primary_key_name + ")")
+                    else:
+                        if j in int_idxs:
+                            header.append(head + ":int")
+                        elif j in float_idxs:
+                            header.append(head + ":float")
+                        else:
+                            header.append(head)
+                print(header)
+                writer.writerow(header)
+            else:
+                if parse_primary_key is True:
+                    if read_data[primary_key_idx] in primary_keys:
+                        continue
+                    else:
+                        primary_keys.append(read_data[primary_key_idx])
+                sub_d = []
+                for j, data in enumerate(read_data):
+                    if j in ignore_idxs:
+                        continue
+                    sub_d.append(data)
+                d.append(sub_d)
+                # print(i)
+        # d = [[i] for i in sorted(list(set(d)))]
+        # print(len(d))
+        writer.writerows(d)
+
+    print("-----------------------  finish " + data_filename + "data parsing for neo4j import  -----------------------")
+
+
+def parse_necessary_data_neo4j_import():
+    parse_data_neo4j_import("movies_metadata", "movies_metadata_neo4j_import", [2, 15, 16, 23], [10, 22], [1, 3, 12, 13, 17], "MOVIE-ID", "id")
+    parse_data_neo4j_import("casts", "casts_neo4j_import", [0, 3, 6], [], [], "CAST-ID", "id")
+    parse_data_neo4j_import("production_companies", "production_companies_neo4j_import", [], [], [], "COMPANY-ID", "id")
+    parse_data_neo4j_import("production_countries", "production_countries_neo4j_import", [], [], [], "COUNTRY-ID", "iso_3166_1")
+    parse_data_neo4j_import("crews", "crews_neo4j_import", [2], [], [], "CREW-ID", "id")
+    parse_data_neo4j_import("genres", "genres_neo4j_import", [], [], [], "GENRE-ID", "id")
+    parse_data_neo4j_import("keywords", "keywords_neo4j_import", [], [], [], "KEYWORD-ID", "id")
+    parse_data_neo4j_import("spoken_languages", "spoken_languages_neo4j_import", [], [], [], "LANGUAGE-ID", "iso_639_1")
+    parse_data_neo4j_import("ratings_merged", "user_neo4j_import", [], [], [1, 2, 3], "USER-ID", "userId", parse_primary_key=True)
+
+
+def generate_relations_neo4j_import(data_filename, output_filename, start_id, end_id, start_name, end_name, int_idxs, float_idxs, ignore_idxs, dir="relations/"):
+    with open(dir + data_filename + ".csv", "r", encoding='UTF-8') as data_file:
+        reader = csv.reader(data_file)
+        file = open("relations_neo4j_import_files/" + output_filename + ".csv", "w")
+        writer = csv.writer(file)
+        header = []
+        for i, read_data in enumerate(reader):
+            if i == 0:
+                for j, head in enumerate(read_data):
+                    if j in ignore_idxs:
+                        continue
+                    if head == start_id:
+                        header.append(":START_ID(" + start_name + ")")
+                    elif head == end_id:
+                        header.append(":END_ID(" + end_name + ")")
+                    else:
+                        if j in int_idxs:
+                            header.append(head + ":int")
+                        elif j in float_idxs:
+                            header.append(head + ":float")
+                        else:
+                            header.append(head)
+                print(header)
+                writer.writerow(header)
+            else:
+                d = []
+                for j, data in enumerate(read_data):
+                    if j in ignore_idxs:
+                        continue
+                    d.append(data)
+                writer.writerow(d)
+                # print(i)
+
+    print("-----------------------  finish " + data_filename + "relation parsing for neo4j import  -----------------------")
+
+
+def generate_relations_neo4j_import_batch():
+    generate_relations_neo4j_import("casts_relation", "casts_relation_neo4j_import", "castId", "movieId", "CAST-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("crews_relation", "crews_relation_neo4j_import", "crewId", "movieId", "CREW-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("genres_relation", "genres_relation_neo4j_import", "movieId", "genreId", "MOVIE-ID", "GENRE-ID", [], [], [])
+    generate_relations_neo4j_import("keywords_relation", "keywords_relation_neo4j_import", "keywordId", "movieId", "KEYWORD-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("production_companies_relation", "production_companies_relation_neo4j_import", "companyId", "movieId", "COMPANY-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("production_countries_relation", "production_countries_relation_neo4j_import", "countryId", "movieId", "COUNTRY-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("spoken_languages_relation", "spoken_languages_relation_neo4j_import", "movieId", "languageId", "MOVIE-ID", "LANGUAGE-ID", [], [], [])
+    generate_relations_neo4j_import("ratings_merged", "ratings_merged_neo4j_import", "userId", "movieId", "USER-ID", "MOVIE-ID", [3], [2], [], dir="parse_files/")
+
+
+print("-----------------------      start data parsing      -------------------------------")
 
 def get_movie_png(movie_name):
     """获取每部电影的封面图片的url"""
@@ -356,5 +462,9 @@ def check_num(a_file, b_file):
 # check_num("ratings", "ratings_small")
 #
 # generate_user()
+print("-----------------------  start data parsing for neo4j import  -----------------------------")
+parse_necessary_data_neo4j_import()
 
-get_info_from_imdb()
+generate_relations_neo4j_import_batch()
+
+# get_info_from_imdb()
