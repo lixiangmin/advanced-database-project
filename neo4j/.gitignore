@@ -105,3 +105,6 @@ venv.bak/
 
 # add
 .idea/
+
+parse_files/
+relations/
