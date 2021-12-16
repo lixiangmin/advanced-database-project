@@ -30,8 +30,8 @@ public class CastController {
     /**
      * 获取
      */
-    @GetMapping("/get")
-    public Cast get(Integer id) {
+    @GetMapping("/get{id}")
+    public Cast get(@PathVariable("id") Integer id) {
         return castService.findById(id);
     }
 
