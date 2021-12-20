@@ -7,6 +7,8 @@ import advanced.database.course.demo.entity.Genre;
 import advanced.database.course.demo.service.GenreService;
 import advanced.database.course.demo.repository.GenreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,5 +46,9 @@ public class GenreServiceImpl implements GenreService {
         return genreRepository.findAll();
     }
 
+    @Override
+    public Page<Genre> findAll(Pageable var1) {
+        return genreRepository.findAll(var1);
+    }
 }
 

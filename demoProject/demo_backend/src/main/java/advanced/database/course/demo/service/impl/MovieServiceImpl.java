@@ -3,10 +3,13 @@ package advanced.database.course.demo.service.impl;
 
 import java.lang.Integer;
 
+import advanced.database.course.demo.entity.Genre;
 import advanced.database.course.demo.entity.Movie;
 import advanced.database.course.demo.service.MovieService;
 import advanced.database.course.demo.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,6 +45,11 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public List<Movie> findAll() {
         return movieRepository.findAll();
+    }
+
+    @Override
+    public Page<Movie> findAll(Pageable var1) {
+        return movieRepository.findAll(var1);
     }
 
 }
