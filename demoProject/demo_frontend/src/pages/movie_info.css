@@ -1,0 +1,40 @@
+.movie-info-container {
+    min-height: 100vh;
+    margin: 0;
+    background: url("../assets/movie_info_background.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+.movie-info-show-card {
+    background: black !important;
+    margin-bottom: 20px !important;
+}
+
+.movie-info-content {
+    margin-left: 10vw;
+    margin-right: 10vw;
+}
+
+.movie-info-show-title {
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.ant-descriptions-title {
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.ant-descriptions-item-label {
+    color: black !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.ant-descriptions-item-content > span {
+    color: white !important;
+    font-size: 1rem;
+    font-weight: bold;
+}

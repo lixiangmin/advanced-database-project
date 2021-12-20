@@ -1,0 +1,22 @@
+.movies-show-container {
+    margin-top: 20px;
+}
+
+.movies-type-show-row {
+    margin-bottom: 20px;
+}
+
+.movies-type {
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.movies-show-more-link {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.movies-type-show-card {
+    background: black !important;
+}

@@ -1,0 +1,57 @@
+.home-container {
+    min-height: 100vh;
+    margin: 0;
+    background: url("../assets/home_background.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+.home-content {
+    margin-left: 10vw;
+    margin-right: 10vw;
+}
+
+.best-movie-container {
+    width: 500px;
+    height: 500px;
+}
+
+#recommend-movie-show-div {
+    text-align: center;
+    margin-top: 20px;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+
+#recommend-movie-title {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.recommend-movie-show-row {
+    /*width: 100vw;*/
+}
+
+#recommend-movie-card {
+    background: black;
+}
+
+#recommend-movie-show-prev {
+    position: absolute;
+    left: 0;
+    font-size: 50px;
+    top: 50%;
+    margin-left: 20px;
+    color: white;
+    opacity: 0.5;
+}
+
+#recommend-movie-show-next {
+    position: absolute;
+    right: 0;
+    font-size: 50px;
+    top: 50%;
+    margin-right: 20px;
+    color: white;
+    opacity: 0.5;
+}

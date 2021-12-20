@@ -1,0 +1,83 @@
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    background: url("../assets/login_background.jpg") no-repeat center center;
+    display: flex;
+    background-size: cover;
+    justify-content: center;
+    align-items: center;
+}
+
+.input {
+    width: 240px;
+}
+
+.login-box {
+    width: 300px;
+    height: 300px;
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, .8);
+    box-sizing: border-box;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, .5);
+    border-radius: 10px;
+}
+
+.login-box h2 {
+    text-align: center;
+    color: #fff;
+    margin-bottom: 30px
+}
+
+.login-field {
+    position: relative;
+}
+
+.login-field input {
+    width: 100%;
+    padding: 10px 0;
+    font-size: 16px;
+    color: #fff;
+    border: none;
+    border-bottom: 1px solid #fff;
+    outline: none;
+    background: transparent;
+}
+
+.login-field label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    letter-spacing: 1px;
+    padding: 10px 0;
+    font-size: 16px;
+    color: #fff;
+    pointer-events: none;
+    transition: .5s;
+}
+
+.login-field input:focus ~ label,
+.login-field input:valid ~ label {
+    top: -23px;
+    left: 0;
+    color: aqua;
+    font-size: 12px;
+}
+
+.login-box button {
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #fff;
+    background: #03a9f4;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+
+#login-footer{
+    position: absolute;
+    bottom: 0;
+}
+
+

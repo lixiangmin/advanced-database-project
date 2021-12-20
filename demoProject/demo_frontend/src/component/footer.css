@@ -1,0 +1,10 @@
+.footer-div {
+    margin-top: 20px;
+    padding-bottom: 20px;
+}
+
+.footer-info-text{
+    color: white !important;
+    font-size: 1rem;
+    font-weight: bold;
+}
