@@ -18,5 +18,7 @@ public interface GenreRepository extends JpaRepository<Genre, Integer> {
     void deleteById(Integer id);
 
     Genre findOneById(Integer id);
+
+    Genre findByName(String name);
 }
 

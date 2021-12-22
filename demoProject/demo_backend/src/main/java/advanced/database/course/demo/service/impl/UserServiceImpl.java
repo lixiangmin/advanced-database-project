@@ -44,5 +44,10 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
+    @Override
+    public boolean login(String username) {
+        return userRepository.findOneByName(username) != null;
+    }
+
 }
 

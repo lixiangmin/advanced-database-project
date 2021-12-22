@@ -24,5 +24,7 @@ public interface UserService {
     User findById(Integer id);
 
     List<User> findAll();
+
+    boolean login(String username);
 }
 

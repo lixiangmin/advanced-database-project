@@ -55,3 +55,12 @@
     color: white;
     opacity: 0.5;
 }
+
+#movie-type-show-tab {
+    color: white;
+}
+
+.movies-type-show-card {
+    background: black !important;
+    margin-top: 30px !important;
+}

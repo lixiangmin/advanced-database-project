@@ -1,5 +1,6 @@
 package advanced.database.course.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ public class Movie {
     private String originalTitle;
     private String overview;
     private Double popularity;
+    private Double score;
     private String posterPath;
     private String releaseDate;
     private Double revenue;
@@ -235,6 +237,16 @@ public class Movie {
         this.voteCount = voteCount;
     }
 
+    @Basic
+    @Column(name = "score")
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -266,7 +278,7 @@ public class Movie {
         return Objects.hash(adult, budget, homepage, id, imdbId, originalLanguage, originalTitle, overview, popularity, posterPath, releaseDate, revenue, runtime, status, tagline, title, video, voteAverage, voteCount);
     }
 
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnore
     @ManyToMany(targetEntity = Cast.class, cascade = CascadeType.ALL)
     @JoinTable(name = "movie_cast",
             joinColumns = {@JoinColumn(name = "movieId", referencedColumnName = "id")},
@@ -280,7 +292,7 @@ public class Movie {
         this.casts = castEntities;
     }
 
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnore
     @ManyToMany(targetEntity = Crew.class, cascade = CascadeType.ALL)
     @JoinTable(name = "movie_crew",
             joinColumns = {@JoinColumn(name = "movieId", referencedColumnName = "id")},
@@ -294,7 +306,7 @@ public class Movie {
         this.crews = crewEntities;
     }
 
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnore
     @ManyToMany(targetEntity = Genre.class, cascade = CascadeType.ALL)
     @JoinTable(name = "movie_genre",
             joinColumns = {@JoinColumn(name = "movieId", referencedColumnName = "id")},
@@ -308,7 +320,7 @@ public class Movie {
         this.genres = genreEntities;
     }
 
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnore
     @ManyToMany(targetEntity = Keyword.class, cascade = CascadeType.ALL)
     @JoinTable(name = "movie_keyword",
             joinColumns = {@JoinColumn(name = "movieId", referencedColumnName = "id")},
@@ -322,7 +334,7 @@ public class Movie {
         this.keywords = keywordEntities;
     }
 
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnore
     @ManyToMany(targetEntity = ProductionCountry.class, cascade = CascadeType.ALL)
     @JoinTable(name = "movie_production_country",
             joinColumns = {@JoinColumn(name = "movieId", referencedColumnName = "id")},
@@ -336,7 +348,7 @@ public class Movie {
         this.productionCountries = productionCountries;
     }
 
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnore
     @ManyToMany(targetEntity = ProductionCompany.class, cascade = CascadeType.ALL)
     @JoinTable(name = "movie_production_company",
             joinColumns = {@JoinColumn(name = "movieId", referencedColumnName = "id")},
@@ -350,7 +362,7 @@ public class Movie {
         this.productionCompanies = productionCompanies;
     }
 
-    @JsonIgnoreProperties(value = {"movies"})
+    @JsonIgnore
     @ManyToMany(targetEntity = SpokenLanguage.class, cascade = CascadeType.ALL)
     @JoinTable(name = "movie_spoken_language",
             joinColumns = {@JoinColumn(name = "movieId", referencedColumnName = "id")},

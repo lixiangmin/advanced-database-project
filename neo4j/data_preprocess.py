@@ -1,4 +1,5 @@
 import csv
+import json
 import random
 import re
 import time
@@ -6,7 +7,7 @@ import time
 import pandas as pd
 from pyquery import PyQuery as pq  # 爬虫库
 import requests
-from pyparsing import unichr
+from setuptools._vendor.pyparsing import unichr
 
 
 def parse_data(data_filename, data_type, data_index, data_id="id", neglect=None):
@@ -291,7 +292,9 @@ def scrape_api(url):
     except requests.RequestException:
         return None
 
-def parse_data_neo4j_import(data_filename, output_filename, int_idxs, float_idxs, ignore_idxs, primary_key_name, primary_key="id", parse_primary_key=False):
+
+def parse_data_neo4j_import(data_filename, output_filename, int_idxs, float_idxs, ignore_idxs, primary_key_name,
+                            primary_key="id", parse_primary_key=False):
     with open("parse_files/" + data_filename + ".csv", "r", encoding='UTF-8') as data_file:
         reader = csv.reader(data_file)
         file = open("parse_neo4j_import_files/" + output_filename + ".csv", "w")
@@ -338,18 +341,22 @@ def parse_data_neo4j_import(data_filename, output_filename, int_idxs, float_idxs
 
 
 def parse_necessary_data_neo4j_import():
-    parse_data_neo4j_import("movies_metadata", "movies_metadata_neo4j_import", [2, 15, 16, 23], [10, 22], [1, 3, 12, 13, 17], "MOVIE-ID", "id")
+    parse_data_neo4j_import("movies_metadata", "movies_metadata_neo4j_import", [2, 15, 16, 23], [10, 22],
+                            [1, 3, 12, 13, 17], "MOVIE-ID", "id")
     parse_data_neo4j_import("casts", "casts_neo4j_import", [0, 3, 6], [], [], "CAST-ID", "id")
     parse_data_neo4j_import("production_companies", "production_companies_neo4j_import", [], [], [], "COMPANY-ID", "id")
-    parse_data_neo4j_import("production_countries", "production_countries_neo4j_import", [], [], [], "COUNTRY-ID", "iso_3166_1")
+    parse_data_neo4j_import("production_countries", "production_countries_neo4j_import", [], [], [], "COUNTRY-ID",
+                            "iso_3166_1")
     parse_data_neo4j_import("crews", "crews_neo4j_import", [2], [], [], "CREW-ID", "id")
     parse_data_neo4j_import("genres", "genres_neo4j_import", [], [], [], "GENRE-ID", "id")
     parse_data_neo4j_import("keywords", "keywords_neo4j_import", [], [], [], "KEYWORD-ID", "id")
     parse_data_neo4j_import("spoken_languages", "spoken_languages_neo4j_import", [], [], [], "LANGUAGE-ID", "iso_639_1")
-    parse_data_neo4j_import("ratings_merged", "user_neo4j_import", [], [], [1, 2, 3], "USER-ID", "userId", parse_primary_key=True)
+    parse_data_neo4j_import("ratings_merged", "user_neo4j_import", [], [], [1, 2, 3], "USER-ID", "userId",
+                            parse_primary_key=True)
 
 
-def generate_relations_neo4j_import(data_filename, output_filename, start_id, end_id, start_name, end_name, int_idxs, float_idxs, ignore_idxs, dir="relations/"):
+def generate_relations_neo4j_import(data_filename, output_filename, start_id, end_id, start_name, end_name, int_idxs,
+                                    float_idxs, ignore_idxs, dir="relations/"):
     with open(dir + data_filename + ".csv", "r", encoding='UTF-8') as data_file:
         reader = csv.reader(data_file)
         file = open("relations_neo4j_import_files/" + output_filename + ".csv", "w")
@@ -382,21 +389,31 @@ def generate_relations_neo4j_import(data_filename, output_filename, start_id, en
                 writer.writerow(d)
                 # print(i)
 
-    print("-----------------------  finish " + data_filename + "relation parsing for neo4j import  -----------------------")
+    print(
+        "-----------------------  finish " + data_filename + "relation parsing for neo4j import  -----------------------")
 
 
 def generate_relations_neo4j_import_batch():
-    generate_relations_neo4j_import("casts_relation", "casts_relation_neo4j_import", "castId", "movieId", "CAST-ID", "MOVIE-ID", [], [], [])
-    generate_relations_neo4j_import("crews_relation", "crews_relation_neo4j_import", "crewId", "movieId", "CREW-ID", "MOVIE-ID", [], [], [])
-    generate_relations_neo4j_import("genres_relation", "genres_relation_neo4j_import", "movieId", "genreId", "MOVIE-ID", "GENRE-ID", [], [], [])
-    generate_relations_neo4j_import("keywords_relation", "keywords_relation_neo4j_import", "keywordId", "movieId", "KEYWORD-ID", "MOVIE-ID", [], [], [])
-    generate_relations_neo4j_import("production_companies_relation", "production_companies_relation_neo4j_import", "companyId", "movieId", "COMPANY-ID", "MOVIE-ID", [], [], [])
-    generate_relations_neo4j_import("production_countries_relation", "production_countries_relation_neo4j_import", "countryId", "movieId", "COUNTRY-ID", "MOVIE-ID", [], [], [])
-    generate_relations_neo4j_import("spoken_languages_relation", "spoken_languages_relation_neo4j_import", "movieId", "languageId", "MOVIE-ID", "LANGUAGE-ID", [], [], [])
-    generate_relations_neo4j_import("ratings_merged", "ratings_merged_neo4j_import", "userId", "movieId", "USER-ID", "MOVIE-ID", [3], [2], [], dir="parse_files/")
+    generate_relations_neo4j_import("casts_relation", "casts_relation_neo4j_import", "castId", "movieId", "CAST-ID",
+                                    "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("crews_relation", "crews_relation_neo4j_import", "crewId", "movieId", "CREW-ID",
+                                    "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("genres_relation", "genres_relation_neo4j_import", "movieId", "genreId", "MOVIE-ID",
+                                    "GENRE-ID", [], [], [])
+    generate_relations_neo4j_import("keywords_relation", "keywords_relation_neo4j_import", "keywordId", "movieId",
+                                    "KEYWORD-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("production_companies_relation", "production_companies_relation_neo4j_import",
+                                    "companyId", "movieId", "COMPANY-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("production_countries_relation", "production_countries_relation_neo4j_import",
+                                    "countryId", "movieId", "COUNTRY-ID", "MOVIE-ID", [], [], [])
+    generate_relations_neo4j_import("spoken_languages_relation", "spoken_languages_relation_neo4j_import", "movieId",
+                                    "languageId", "MOVIE-ID", "LANGUAGE-ID", [], [], [])
+    generate_relations_neo4j_import("ratings_merged", "ratings_merged_neo4j_import", "userId", "movieId", "USER-ID",
+                                    "MOVIE-ID", [3], [2], [], dir="parse_files/")
 
 
 print("-----------------------      start data parsing      -------------------------------")
+
 
 def get_movie_png(movie_name):
     """获取每部电影的封面图片的url"""
@@ -448,7 +465,47 @@ def check_num(a_file, b_file):
     print("merged_data_num: " + str(row_count("parse_files/" + a_file + "_merged.csv")))
 
 
+def get_poster_from_omdb(api_key, start_id="862"):
+    with open("parse_files/posters.csv", "a", encoding="UTF-8") as poster_file:
+        poster_file_write = csv.writer(poster_file)
+        continue_flag = False
+        with open("parse_files/movies_metadata.csv", "r", encoding='UTF-8') as movies:
+            movies_reader = csv.reader(movies)
+            next(movies_reader)
+
+            for movie in movies_reader:
+                movie_id = movie[5]
+                if not continue_flag and movie_id == start_id:
+                    continue_flag = True
+                if continue_flag:
+                    try:
+                        imdb_id = movie[6]
+                        if imdb_id == "":
+                            continue
+                        para = {"tt": imdb_id}
+                        # data = requests.post("https://betterimdbot.herokuapp.com/", para)
+                        data = requests.get("http://www.omdbapi.com/?apikey=" + api_key + "&i=" + imdb_id)
+                        trails = 0
+                        while data.status_code != 200 and trails < 10:
+                            data = requests.get("http://www.omdbapi.com/?apikey=" + api_key + "&i=" + imdb_id)
+                            # data = requests.post("https://betterimdbot.herokuapp.com/", para)
+                            trails = trails + 1
+                        print(json.loads(data.content)["Poster"])
+                        # if not json.loads(data.content).__contains__("poster"):
+                        #     continue
+                        # print(json.loads(data.content)["poster"])
+                        poster_file_write.writerow([movie_id, json.loads(data.content)["Poster"]])
+                        # poster_file_write.writerow([movie_id, json.loads(data.content)["poster"]])
+                    except Exception as e:
+                        print(e)
+                        print(movie_id)
+                        return movie_id
+    return None
+
+
 # print("-----------------------      start data parsing      -------------------------------")
+
+
 #
 # parse_necessary_data()
 #
@@ -462,9 +519,47 @@ def check_num(a_file, b_file):
 # check_num("ratings", "ratings_small")
 #
 # generate_user()
-print("-----------------------  start data parsing for neo4j import  -----------------------------")
-parse_necessary_data_neo4j_import()
-
-generate_relations_neo4j_import_batch()
+# print("-----------------------  start data parsing for neo4j import  -----------------------------")
+# parse_necessary_data_neo4j_import()
+#
+# generate_relations_neo4j_import_batch()
 
 # get_info_from_imdb()
+# api_keys = ["9a439834", "f9bf98fc", "f853334d", "3868f7e6", "9062d67e", "4ef56ef0", "cccbec2e", "73b1f0ea"]
+# start_id = "44333"
+# index = 0
+# while start_id is not None:
+#     start_id = get_poster_from_omdb(api_keys[0], start_id)
+#     index += 1
+new_movies_file = open("parse_files/new_movies.csv", "w", encoding='UTF-8')
+new_movies_file_writer = csv.writer(new_movies_file)
+posters_map = {}
+score_map = {}
+with open("parse_files/posters.csv", "r", encoding='UTF-8') as posters:
+    posters_reader = csv.reader(posters)
+    next(posters_reader)
+    for poster in posters_reader:
+        posters_map[poster[0]] = poster[1]
+
+with open("parse_files/avg_ratings.csv", "r", encoding='UTF-8') as score:
+    score_reader = csv.reader(score)
+    next(score_reader)
+    for score in score_reader:
+        score_map[score[1]] = score[0]
+
+with open("parse_files/movies_metadata.csv", "r", encoding='UTF-8') as movies:
+    movies_reader = csv.reader(movies)
+    header = next(movies_reader)
+    header.append("score")
+    new_movies_file_writer.writerow(header)
+    for movie in movies_reader:
+        if len(movie) != 24:
+            continue
+        movie_id = movie[5]
+        if posters_map.__contains__(movie_id):
+            movie[11] = posters_map[movie_id]
+        if score_map.__contains__(movie_id):
+            movie.append(score_map[movie_id])
+        else:
+            movie.append(0)
+        new_movies_file_writer.writerow(movie)

@@ -20,31 +20,46 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b54b62fc-ca2a-4a9d-962e-492b97aaf457" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/demo_frontend.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/home_background.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/login_background.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/assets/movie_info_background.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/component/footer.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/component/footer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/component/header.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/component/header.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/component/movie_card.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/component/show_movie_by_type.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/component/show_movie_by_type.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/constants.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/home.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/home.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/login.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/login.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/movie_info.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/pages/movie_info.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/request.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/store.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/search.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/pages/search.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/CastController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/CastController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/GenreController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/GenreController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/MovieController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/MovieController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Cast.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Cast.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Crew.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Crew.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Genre.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Genre.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Keyword.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Keyword.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Movie.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/Movie.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/ProductionCompany.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/ProductionCompany.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/ProductionCountry.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/ProductionCountry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/SpokenLanguage.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/entity/SpokenLanguage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/GenreRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/GenreRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/MovieRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/MovieRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/RatingRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/RatingRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/GenreService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/GenreService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/MovieService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/MovieService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/impl/GenreServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/impl/GenreServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/impl/MovieServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/impl/MovieServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/java/advanced/database/course/demo/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../demo_backend/src/main/resources/static/databaseCreate.sql" beforeDir="false" afterPath="$PROJECT_DIR$/../demo_backend/src/main/resources/static/databaseCreate.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/header.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/header.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/movie_card.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/movie_card.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/show_movie_by_type.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/show_movie_by_type.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/component/show_movie_by_type.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/component/show_movie_by_type.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/home.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/home.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/home.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/home.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/login.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/movie_info.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/movie_info.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/movie_info.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/movie_info.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/request.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/request.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/store.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/store.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../neo4j/data_preprocess.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../neo4j/data_preprocess.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -112,6 +127,19 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -125,6 +153,8 @@
       <workItem from="1639726525219" duration="6263000" />
       <workItem from="1639734927113" duration="9913000" />
       <workItem from="1639964292836" duration="6938000" />
+      <workItem from="1640023600478" duration="4747000" />
+      <workItem from="1640063913050" duration="28951000" />
     </task>
     <servers />
   </component>

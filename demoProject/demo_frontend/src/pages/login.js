@@ -18,7 +18,7 @@ export default class LoginPage extends React.Component {
             successCb: resp => {
                 store.dispatch({
                     type: "login",
-                    loginInfo: resp.data
+                    loginInfo: this.state.username
                 });
                 this.setState({loginLoading: false});
                 message.success(resp.msg)
@@ -59,13 +59,13 @@ export default class LoginPage extends React.Component {
                             <Button type="primary"
                                     onClick={() => {
                                         this.login({username: this.state.username})
-                                    }}>登陆</Button>
+                                    }}>Login</Button>
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary"
                                     onClick={() => {
                                         this.visit()
-                                    }}>访问</Button>
+                                    }}>Visit</Button>
                         </Form.Item>
                     </Form>
                 </div>

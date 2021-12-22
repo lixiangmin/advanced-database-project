@@ -29,5 +29,15 @@ public interface MovieService {
     List<Movie> findAll();
 
     Page<Movie> findAll(Pageable var1);
+
+    List<Movie> findRecommendMovies();
+
+    List<Movie> getRecommendsById(Integer id);
+
+    Page<Movie> searchMoviesByText(String text, Pageable pageRequest);
+
+    Page<Movie> searchMoviesByGenreId(int type, Pageable pageRequest);
+
+    Page<Movie> searchMoviesByMovieId(int movieId, Pageable pageRequest);
 }
 

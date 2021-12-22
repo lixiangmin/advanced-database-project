@@ -1,0 +1,32 @@
+.search-movies-container {
+    min-height: 100vh;
+    margin: 0;
+    background: url("../assets/search_background.jpg") no-repeat center center;
+    background-size: cover;
+}
+
+.search-movies-content {
+    margin-left: 10vw;
+    margin-right: 10vw;
+}
+
+.search-movies-show-card {
+    background: black !important;
+    min-height: 80vh;
+}
+
+#search-movies-show-title {
+    color: white !important;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.search-movie-info-show-title {
+    color: white !important;
+    font-size: 1.5rem;
+}
+
+.search-movie-info-show-content {
+    color: white !important;
+    font-size: 1.2rem;
+}

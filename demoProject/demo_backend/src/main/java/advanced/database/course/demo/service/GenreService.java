@@ -25,6 +25,8 @@ public interface GenreService {
 
     Genre findById(Integer id);
 
+    Genre findByName(String name);
+
     List<Genre> findAll();
 
     Page<Genre> findAll(Pageable var1);

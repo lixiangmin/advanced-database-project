@@ -1,10 +1,10 @@
 import { createStore } from 'redux';
 
 
-function adminReducer(state, action) {
+function userReducer(state, action) {
   switch(action.type) {
     case 'login':
-      return { ...state, userInfo: action.userInfo };
+      return { ...state, userInfo: action.loginInfo };
     case 'logout':
       return { ...state, userInfo: undefined };
     default:
@@ -12,4 +12,4 @@ function adminReducer(state, action) {
   }
 }
 
-export default createStore(adminReducer);
+export default createStore(userReducer);

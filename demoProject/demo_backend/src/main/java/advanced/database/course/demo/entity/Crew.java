@@ -1,5 +1,6 @@
 package advanced.database.course.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
@@ -109,7 +110,7 @@ public class Crew {
         return Objects.hash(creditId, department, gender, id, job, name, profilePath);
     }
 
-    @JsonIgnoreProperties(value = {"crews"})
+    @JsonIgnore
     @ManyToMany(mappedBy = "crews")
     public Set<Movie> getMovies() {
         return movies;

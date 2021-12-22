@@ -3,18 +3,27 @@ import {Typography, Col, Row, Image, Input} from 'antd';
 import './header.css'
 import logo from '../assets/logo.png'
 import {Link} from "react-router-dom";
+import store from "../store";
 
 const {Search} = Input;
 
-const onSearch = (value) => {
-    console.log(value)
-}
 export default class HeaderMenu extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {
+            username: undefined
+        };
     }
 
+    onSearch(key) {
+        this.props.history.push({
+            pathname: '/search',
+            state: {
+                type: "text",
+                value: key
+            }
+        });
+    }
 
     render() {
         return (
@@ -30,18 +39,21 @@ export default class HeaderMenu extends React.Component {
                                 </Col>
                                 <Col>
                                     <Link to="/home"
-                                                     id={"header-menu-title-text"}>FindingMovies</Link>
+                                          id={"header-menu-title-text"}>FindingMovies</Link>
                                 </Col>
 
                             </Row>
                         </Col>
                         <Col span={13}>
                             <Search
-                                onSearch={onSearch}
-                                placeholder="Enter movie name"/>
+                                onSearch={(key) => {
+                                    this.onSearch(key)
+                                }}
+                                placeholder="Enter Movie Text"/>
                         </Col>
                         <Col span={3}>
-                            <Typography.Text id={"header-menu-title-text"}>用户名</Typography.Text>
+                            <Typography.Text
+                                id={"header-menu-title-text"}>{store.getState() === undefined ? "visitor" : store.getState().userInfo === undefined ? "visitor" : store.getState().userInfo}</Typography.Text>
                         </Col>
                     </Row>
                 </Row>

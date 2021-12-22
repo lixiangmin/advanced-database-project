@@ -38,3 +38,11 @@
     font-size: 1rem;
     font-weight: bold;
 }
+
+.ant-table {
+    height: 600px !important;
+}
+
+.ant-empty-normal {
+    margin: 140px 0 !important;
+}

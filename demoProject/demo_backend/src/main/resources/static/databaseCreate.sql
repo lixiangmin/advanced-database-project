@@ -4,12 +4,12 @@ create table if not exists movie
     budget            double,
     homepage          varchar(1000),
     id                int not null primary key,
-    imdb_id            varchar(10),
+    imdb_id           varchar(10),
     original_language varchar(5),
     original_title    varchar(200),
     overview          varchar(2000),
     popularity        double,
-    poster_path       varchar(100),
+    poster_path       varchar(255),
     release_date      varchar(15),
     revenue           double,
     runtime           double,
@@ -17,6 +17,7 @@ create table if not exists movie
     tagline           varchar(1000),
     title             varchar(200),
     video             varchar(10),
+    score             double,
     vote_average      double,
     vote_count        int
 ) engine = InnoDB
@@ -46,8 +47,8 @@ create table if not exists production_company
 create table if not exists movie_production_company
 (
     production_company_id int not null,
-    relation_id          int not null unique auto_increment primary key,
-    movie_id             int not null,
+    relation_id           int not null unique auto_increment primary key,
+    movie_id              int not null,
     foreign key fk_movie (movie_id) references movie (id),
     foreign key fk_production_company (production_company_id) references production_company (id)
 ) engine = InnoDB
@@ -60,7 +61,7 @@ create table if not exists production_country
   default charset = utf8;
 create table if not exists movie_production_country
 (
-    iso_3166_1 varchar(10) not null,
+    iso_3166_1  varchar(10) not null,
     relation_id int         not null auto_increment primary key,
     movie_id    int         not null,
     foreign key fk_movie (movie_id) references movie (id),
@@ -75,7 +76,7 @@ create table if not exists spoken_language
   default charset = utf8;
 create table if not exists movie_spoken_language
 (
-    iso_639_1  varchar(10) not null,
+    iso_639_1   varchar(10) not null,
     relation_id int         not null auto_increment primary key,
     movie_id    int         not null,
     foreign key fk_movie (movie_id) references movie (id),
@@ -85,7 +86,7 @@ create table if not exists movie_spoken_language
 
 create table if not exists link
 (
-    id      int not null auto_increment primary key,
+    id       int not null auto_increment primary key,
     movie_id int not null,
     imdb_id  int,
     tmdb_id  int,
@@ -101,8 +102,8 @@ create table if not exists user
 
 create table if not exists rating
 (
-    user_id    int,
-    movie_id   int not null,
+    user_id   int,
+    movie_id  int not null,
     rating    double,
     timestamp bigint,
     ratingId  int not null auto_increment primary key,
@@ -168,3 +169,4 @@ create table if not exists movie_keyword
     foreign key fk_keyword (keyword_id) references keyword (id)
 ) engine = InnoDB
   default charset = utf8;
+

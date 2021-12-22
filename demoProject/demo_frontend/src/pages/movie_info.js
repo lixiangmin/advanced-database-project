@@ -2,19 +2,121 @@ import React, {useState} from 'react';
 import './movie_info.css'
 import HeaderMenu from "../component/header";
 import FindingMoviesFooter from "../component/footer";
-import {Modal, Rate, Descriptions, Col, Image, Row, Card, Tag, Table, Typography, Button} from "antd";
+import {Modal, Rate, Descriptions, Col, Image, Row, Card, Tag, Table, Typography, Button, Space} from "antd";
 import logo from "../assets/logo.png";
+import {
+    findMovieById,
+    findTheCastsOfMovie,
+    findTheCrewsOfMovie,
+    findTheRecommendsOfMovie,
+    findTheTypesOfMovie
+} from "../request";
 import ShowMovieByType from "../component/show_movie_by_type";
-
+import store from "../store";
 
 export default class MovieInfoPage extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
+            movie: {},
+            types: [],
+            crews: [],
+            casts: [],
+            recommends: [],
             castVisible: false,
             crewVisible: false,
+            rateVisible: false,
+            id: this.props.match.params.id
         };
+    }
+
+    componentDidUpdate(prevProps) {
+        // 典型用法（不要忘记比较 props）：
+        if (this.props.match.params.id !== prevProps.match.params.id) {
+            this.setState({
+                id: this.props.match.params.id
+            }, () => {
+                this.getData()
+            });
+        }
+    }
+
+    componentDidMount() {
+        this.getData();
+    }
+
+    getData() {
+        this.getMovieById();
+        this.getTypesById();
+        this.getCrewsById();
+        this.getCastsById();
+        this.getRecommendsById();
+    }
+
+    getMovieById() {
+        findMovieById(this.state.id, {
+            successCb: resp => {
+                this.setState({
+                    movie: resp.movie
+                });
+            }
+        })
+    }
+
+    getTypesById() {
+        findTheTypesOfMovie({id: this.state.id},
+            {
+                successCb: resp => {
+                    this.setState({
+                        types: resp.types
+                    });
+                }
+            })
+    }
+
+    getCastsById() {
+        findTheCastsOfMovie({id: this.state.id},
+            {
+                successCb: resp => {
+                    this.setState({
+                        casts: resp.casts
+                    });
+                }
+            })
+    }
+
+    getCrewsById() {
+        findTheCrewsOfMovie({id: this.state.id},
+            {
+                successCb: resp => {
+                    this.setState({
+                        crews: resp.crews
+                    });
+                }
+            })
+    }
+
+    getRecommendsById() {
+        findTheRecommendsOfMovie(this.state.id, {
+            successCb: resp => {
+                this.setState({
+                    recommends: resp.recommends
+                });
+            }
+        })
+    }
+
+    openRateModel() {
+        this.setState({
+            rateVisible: true
+        })
+    }
+
+    closeRateModel() {
+        this.setState({
+            rateVisible: false
+        })
     }
 
     openCrewModel() {
@@ -43,26 +145,9 @@ export default class MovieInfoPage extends React.Component {
 
     render() {
         const colors = ["magenta", "red", "volcano", "orange", "gold", "lime", "green", "cyan", "blue", "geekblue", "purple"]
-        const casts = [
-            {"_character": "Disappointed Man", "name": "George Lucas"},
-            {"_character": "Disappointed Man", "name": "George Lucas"},
-            {"_character": "Disappointed Man", "name": "George Lucas"},
-            {"_character": "Disappointed Man", "name": "George Lucas"},
-            {"_character": "Disappointed Man", "name": "George Lucas"},
-            {"_character": "Disappointed Man", "name": "George Lucas"},
-            {"_character": "Disappointed Man", "name": "George Lucas"},
-        ]
-        const crews = [
-            {"job": "Director", "name": "George Lucas"},
-            {"job": "Director", "name": "George Lucas"},
-            {"job": "Director", "name": "George Lucas"},
-            {"job": "Director", "name": "George Lucas"},
-            {"job": "Director", "name": "George Lucas"},
-            {"job": "Director", "name": "George Lucas"},
-        ]
         return (
             <div className={"movie-info-container"}>
-                <HeaderMenu/>
+                <HeaderMenu history={this.props.history}/>
                 <div className={"movie-info-content"}>
                     <Card className={"movie-info-show-card"}>
                         <Row wrap={false} align={"middle"}>
@@ -70,51 +155,56 @@ export default class MovieInfoPage extends React.Component {
                                 <Image
                                     className={"movie-card-image-style"}
                                     preview={false}
-                                    src={"https://m.media-amazon.com/images/M/MV5BMjI2ODE4ODAtMDA3MS00ODNkLTg4N2EtOGU0YjZmNGY4NjZlXkEyXkFqcGdeQXVyMTY5MDE5NA@@._V1_.jpg"}
+                                    src={this.state.movie.posterPath}
                                     fallback={logo}
-                                    alt={"8844"}/>
+                                    alt={this.state.movie.title}/>
                             </Col>
                             <Col offset={1}>
                                 <Descriptions className={"movie-info-show-title"} labelStyle={{color: "white"}}
-                                              title="Forrest Gump" bordered>
-                                    <Descriptions.Item label="adult">False</Descriptions.Item>
-                                    <Descriptions.Item label="status">Released</Descriptions.Item>
-                                    <Descriptions.Item label="original language">en</Descriptions.Item>
+                                              title={this.state.movie.title} bordered>
+                                    <Descriptions.Item label="adult">{this.state.movie.adult}</Descriptions.Item>
+                                    <Descriptions.Item label="status">{this.state.movie.status}</Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="original language">{this.state.movie.originalLanguage}</Descriptions.Item>
 
-                                    <Descriptions.Item label="budget">94000000</Descriptions.Item>
-                                    <Descriptions.Item label="imdb id">tt0266543</Descriptions.Item>
-                                    <Descriptions.Item label="revenue">677945399</Descriptions.Item>
+                                    <Descriptions.Item label="budget">{this.state.movie.budget}</Descriptions.Item>
+                                    <Descriptions.Item label="imdb id">{this.state.movie.imdbId}</Descriptions.Item>
+                                    <Descriptions.Item label="revenue">{this.state.movie.revenue}</Descriptions.Item>
 
-                                    <Descriptions.Item label="original title">Finding Nemo</Descriptions.Item>
-                                    <Descriptions.Item label="popularity">25.497794</Descriptions.Item>
-                                    <Descriptions.Item label="release date">2003-05-30</Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="original title">{this.state.movie.originalTitle}</Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="popularity">{this.state.movie.popularity}</Descriptions.Item>
+                                    <Descriptions.Item
+                                        label="release date">{this.state.movie.releaseDate}</Descriptions.Item>
                                     <Descriptions.Item span={3}
-                                                       label="homepage">http://www.starwars.com/films/star-wars-episode-iv-a-new-hope</Descriptions.Item>
-                                    <Descriptions.Item span={3} label="tag line">The world will never be the same, once
-                                        you've seen it through the eyes of Forrest Gump.</Descriptions.Item>
-                                    <Descriptions.Item span={3} label="overview">Nemo, an adventurous young clownfish,
-                                        is unexpectedly taken from his Great Barrier Reef home to a dentist's office
-                                        aquarium. It's up to his worrisome father Marlin and a friendly but forgetful
-                                        fish Dory to bring Nemo home -- meeting vegetarian sharks, surfer dude turtles,
-                                        hypnotic jellyfish, hungry seagulls, and more along the way.</Descriptions.Item>
+                                                       label="homepage">{this.state.movie.homepage}</Descriptions.Item>
+                                    <Descriptions.Item span={3}
+                                                       label="tag line">{this.state.movie.tagline}</Descriptions.Item>
+                                    <Descriptions.Item span={3}
+                                                       label="overview">{this.state.movie.overview}</Descriptions.Item>
 
                                     <Descriptions.Item span={3} label="genres">
-                                        <Tag color={colors[0]}>恐怖片</Tag>
-                                        <Tag color={colors[1]}>恐怖片</Tag>
-                                        <Tag color={colors[2]}>恐怖片</Tag>
-                                        <Tag color={colors[3]}>恐怖片</Tag>
-                                        <Tag color={colors[4]}>恐怖片</Tag>
-                                        <Tag color={colors[5]}>恐怖片</Tag>
-                                        <Tag color={colors[6]}>恐怖片</Tag>
-                                        <Tag color={colors[7]}>恐怖片</Tag>
+                                        {this.state.types.map((item, i) => {
+                                            let index = i
+                                            if (i >= colors.length) {
+                                                index = i % colors.length
+                                            }
+                                            return <Tag color={colors[index]}>{item.name}</Tag>
+                                        })
+                                        }
                                     </Descriptions.Item>
                                     <Descriptions.Item span={3} label="rating">
-                                        <Rate allowHalf disabled={true} defaultValue={4.7}/>
+                                        <Rate allowHalf disabled={true} value={this.state.movie.score}/>
                                     </Descriptions.Item>
                                     <Descriptions.Item span={3} label="extra">
                                         <Row justify={"space-around"}>
                                             <Button className={"extra-info-button"} type="primary"
                                                     onClick={() => this.openCastModel()}>Show Casts</Button>
+                                            {store.getState() !== undefined && store.getState().userInfo !== undefined ?
+                                                <Button className={"extra-info-button"} type="primary"
+                                                        onClick={() => this.openRateModel()}>Rate Movie</Button>
+                                            :<div/>}
                                             <Button className={"extra-info-button"} type="primary"
                                                     onClick={() => this.openCrewModel()}>Show Crews</Button>
                                         </Row>
@@ -123,43 +213,62 @@ export default class MovieInfoPage extends React.Component {
                             </Col>
                         </Row>
                     </Card>
-                    <ShowMovieByType/>
+                    {
+                        this.state.recommends.length > 0 ? <Card className={"movie-info-show-card"}>
+                            <ShowMovieByType id={this.state.id} type={"Recommends"} history={this.props.history}
+                                             movies={this.state.recommends}/>
+                        </Card> : <div/>
+                    }
                 </div>
                 <FindingMoviesFooter/>
-                <Modal title="Cast List" visible={this.state.castVisible} onOk={() => this.closeCastModel()}
+                <Modal title="Cast List" visible={this.state.castVisible}
+                       onOk={() => this.closeCastModel()}
                        onCancel={() => this.closeCastModel()}>
                     <Table
+                        scroll={{y: 550}}
                         pagination={{
+                            hideOnSinglePage: true,
                             showSizeChanger: true,
                             position: ["none", "bottomCenter"],
-                            total: casts.length,
+                            total: this.state.casts.length,
                             onChange: (page, pageSize) => {
                                 this.setState({pageSize: pageSize});
                             }
                         }}
-                        dataSource={casts}>
-                        <Table.Column title="Character" dataIndex="_character" key="_character"/>
+                        dataSource={this.state.casts}>
+                        <Table.Column title="Character" dataIndex="character" key="character"/>
                         <Table.Column title="Name" dataIndex="name" key="castName"/>
                     </Table>
                 </Modal>
-                <Modal title="Crew List" visible={this.state.crewVisible} onOk={() => this.closeCrewModel()}
+                <Modal title="Crew List" visible={this.state.crewVisible}
+                       onOk={() => this.closeCrewModel()}
                        onCancel={() => this.closeCrewModel()}>
                     <Table
+                        scroll={{y: 550}}
                         pagination={{
+                            hideOnSinglePage: true,
                             showSizeChanger: true,
                             position: ["none", "bottomCenter"],
-                            total: crews.length,
+                            total: this.state.crews.length,
                             onChange: (page, pageSize) => {
                                 this.setState({pageSize: pageSize});
                             }
                         }}
-                        dataSource={crews}>
+                        dataSource={this.state.crews}>
+                        <Table.Column title="Department" dataIndex="department" key="department"/>
                         <Table.Column title="Job" dataIndex="job" key="job"/>
                         <Table.Column title="Name" dataIndex="name" key="crewName"/>
                     </Table>
                 </Modal>
+                <Modal width={300} title="Rate Panel" visible={this.state.rateVisible}
+                       onOk={() => this.closeRateModel()}
+                       onCancel={() => this.closeRateModel()}>
+                    <Space direction={"vertical"} align={"center"}>
+                        <Typography.Text>Tell Your Feeling About This Movie.</Typography.Text>
+                        <Rate allowHalf/>
+                    </Space>
+                </Modal>
             </div>
         );
     }
-
 }
