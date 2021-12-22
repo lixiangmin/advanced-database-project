@@ -13,7 +13,7 @@ export default class FindingMoviesFooter extends React.Component {
         return (
             <div className={"footer-div"}>
                 <Typography.Text className={"footer-info-text"}>Finding Movies ©2021 Created by Group
-                    7</Typography.Text>
+                    9</Typography.Text>
             </div>
         );
     }
