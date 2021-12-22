@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-12-13 13:00:06
  */
 @RestController
-@RequestMapping("/spokenLanguage")
+@RequestMapping("/api/spokenLanguage")
 @AllArgsConstructor
 public class SpokenLanguageController {
 

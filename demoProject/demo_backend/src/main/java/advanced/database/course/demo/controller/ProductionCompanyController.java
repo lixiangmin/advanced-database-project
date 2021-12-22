@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-12-13 13:00:03
  */
 @RestController
-@RequestMapping("/productionCompany")
+@RequestMapping("/api/productionCompany")
 @AllArgsConstructor
 public class ProductionCompanyController {
 

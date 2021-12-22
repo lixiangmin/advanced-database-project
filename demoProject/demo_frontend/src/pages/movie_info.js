@@ -7,7 +7,7 @@ import logo from "../assets/logo.png";
 import {
     findMovieById,
     findTheCastsOfMovie,
-    findTheCrewsOfMovie,
+    findTheCrewsOfMovie, findTheKeywordsOfMovie,
     findTheRecommendsOfMovie,
     findTheTypesOfMovie
 } from "../request";
@@ -21,6 +21,7 @@ export default class MovieInfoPage extends React.Component {
         this.state = {
             movie: {},
             types: [],
+            keywords: [],
             crews: [],
             casts: [],
             recommends: [],
@@ -49,6 +50,7 @@ export default class MovieInfoPage extends React.Component {
     getData() {
         this.getMovieById();
         this.getTypesById();
+        this.getKeywordsById();
         this.getCrewsById();
         this.getCastsById();
         this.getRecommendsById();
@@ -70,6 +72,17 @@ export default class MovieInfoPage extends React.Component {
                 successCb: resp => {
                     this.setState({
                         types: resp.types
+                    });
+                }
+            })
+    }
+
+    getKeywordsById() {
+        findTheKeywordsOfMovie({id: this.state.id},
+            {
+                successCb: resp => {
+                    this.setState({
+                        keywords: resp.keywords
                     });
                 }
             })
@@ -194,6 +207,16 @@ export default class MovieInfoPage extends React.Component {
                                         })
                                         }
                                     </Descriptions.Item>
+                                    <Descriptions.Item span={3} label="keywords">
+                                        {this.state.keywords.map((item, i) => {
+                                            let index = i
+                                            if (i >= colors.length) {
+                                                index = i % colors.length
+                                            }
+                                            return <Tag color={colors[colors.length - 1 - index]}>{item.name}</Tag>
+                                        })
+                                        }
+                                    </Descriptions.Item>
                                     <Descriptions.Item span={3} label="rating">
                                         <Rate allowHalf disabled={true} value={this.state.movie.score}/>
                                     </Descriptions.Item>
@@ -204,7 +227,7 @@ export default class MovieInfoPage extends React.Component {
                                             {store.getState() !== undefined && store.getState().userInfo !== undefined ?
                                                 <Button className={"extra-info-button"} type="primary"
                                                         onClick={() => this.openRateModel()}>Rate Movie</Button>
-                                            :<div/>}
+                                                : <div/>}
                                             <Button className={"extra-info-button"} type="primary"
                                                     onClick={() => this.openCrewModel()}>Show Crews</Button>
                                         </Row>

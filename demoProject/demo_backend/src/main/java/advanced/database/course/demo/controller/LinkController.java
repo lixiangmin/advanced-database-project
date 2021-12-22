@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-12-13 13:00:02
  */
 @RestController
-@RequestMapping("/link")
+@RequestMapping("/api/link")
 @AllArgsConstructor
 public class LinkController {
 

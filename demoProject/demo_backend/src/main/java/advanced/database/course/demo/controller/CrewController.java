@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-12-13 12:59:58
  */
 @RestController
-@RequestMapping("/crew")
+@RequestMapping("/api/crew")
 @AllArgsConstructor
 public class CrewController {
 

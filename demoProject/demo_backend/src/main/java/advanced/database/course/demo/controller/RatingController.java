@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-12-13 13:00:05
  */
 @RestController
-@RequestMapping("/rating")
+@RequestMapping("/api/rating")
 @AllArgsConstructor
 public class RatingController {
 

@@ -66,7 +66,7 @@ public class MovieServiceImpl implements MovieService {
     public List<Movie> getRecommendsById(Integer id) {
         int targetNum = 6;
         List<Rating> ratings = ratingRepository.findByMovieId(id);
-        Collections.sort(ratings, (Comparator<Rating>) (o1, o2) -> o2.getRating().compareTo(o1.getRating()));
+        Collections.sort(ratings, (Comparator<Rating>) (o1, o2) -> o2.getScore().compareTo(o1.getScore()));
         int end = Math.min(ratings.size(), 100);
         ratings = ratings.subList(0, end);
         HashMap<Integer, Integer> maps = new HashMap<>();
@@ -93,6 +93,7 @@ public class MovieServiceImpl implements MovieService {
         while (movies.size() < targetNum && index < list.size()) {
             int movieId = list.get(index).getKey();
             if (movieId == id) {
+                index += 1;
                 continue;
             }
             Movie movie = movieRepository.findOneById(movieId);
@@ -130,12 +131,12 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public Page<Movie> searchMoviesByGenreId(int genreId, Pageable pageRequest) {
-        return movieRepository.searchMoviesByGenreId(genreId,pageRequest);
+        return movieRepository.searchMoviesByGenreId(genreId, pageRequest);
     }
 
     @Override
     public Page<Movie> searchMoviesByMovieId(int movieId, Pageable pageRequest) {
-        return movieRepository.searchMoviesByMovieId(movieId,pageRequest);
+        return movieRepository.searchMoviesByMovieId(movieId, pageRequest);
     }
 
 }

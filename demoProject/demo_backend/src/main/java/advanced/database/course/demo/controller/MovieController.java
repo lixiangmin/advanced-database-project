@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-12-13 13:00:02
  */
 @RestController
-@RequestMapping("/movie")
+@RequestMapping("/api/movie")
 @AllArgsConstructor
 @CrossOrigin
 public class MovieController {
@@ -152,6 +152,15 @@ public class MovieController {
         result.put("msg", "Success");
         Movie movie = movieService.findById(id);
         result.put("types", movie.getGenres());
+        result.put("code", 0);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @GetMapping("/getKeywords")
+    public ResponseEntity<?> getKeywords(@RequestParam("id") Integer id) {
+        Map<Object, Object> result = new HashMap<>();
+        result.put("msg", "Success");
+        Movie movie = movieService.findById(id);
+        result.put("keywords", movie.getKeywords());
         result.put("code", 0);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

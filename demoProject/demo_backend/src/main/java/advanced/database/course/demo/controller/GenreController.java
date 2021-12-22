@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2021-12-13 12:59:59
  */
 @RestController
-@RequestMapping("/genre")
+@RequestMapping("/api/genre")
 @AllArgsConstructor
 @CrossOrigin
 public class GenreController {

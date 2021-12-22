@@ -5,7 +5,7 @@ import {sprintf} from 'sprintf-js';
 
 import constants from './constants';
 
-const BASE_URL = "http://127.0.0.1:8080";
+const BASE_URL = "http://127.0.0.1:8080/api";
 const USER_LOGIN_PATH = BASE_URL + "/user/login";
 const RECOMMEND_MOVIES = BASE_URL + "/movie/recommend/movies";
 const GET_MOVIE_BY_ID = BASE_URL + "/movie/%s";
@@ -14,6 +14,7 @@ const GET_MOVIE_LIST_BY_TEXT = BASE_URL + "/movie/searchByText";
 const GET_MOVIE_LIST_BY_GENRE_ID = BASE_URL + "/movie/searchByGenreId";
 const GET_MOVIE_LIST_BY_MOVIE_ID = BASE_URL + "/movie/searchByMovieId";
 const GET_THE_TYPES_OF_MOVIE = BASE_URL + "/movie/getTypes";
+const GET_THE_KEYWORDS_OF_MOVIE = BASE_URL + "/movie/getKeywords";
 const GET_THE_CREWS_OF_MOVIE = BASE_URL + "/movie/getCrews";
 const GET_THE_CASTS_OF_MOVIE = BASE_URL + "/movie/getCasts";
 const GET_MOVIES_WITH_TYPE = BASE_URL + "/genre/getMovies";
@@ -84,6 +85,14 @@ export function findTheTypesOfMovie(params, opt) {
     request({
         method: "GET",
         url: GET_THE_TYPES_OF_MOVIE,
+        params: params
+    }, opt);
+}
+
+export function findTheKeywordsOfMovie(params, opt) {
+    request({
+        method: "GET",
+        url: GET_THE_KEYWORDS_OF_MOVIE,
         params: params
     }, opt);
 }

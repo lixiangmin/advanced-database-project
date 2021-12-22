@@ -531,35 +531,86 @@ def get_poster_from_omdb(api_key, start_id="862"):
 # while start_id is not None:
 #     start_id = get_poster_from_omdb(api_keys[0], start_id)
 #     index += 1
-new_movies_file = open("parse_files/new_movies.csv", "w", encoding='UTF-8')
-new_movies_file_writer = csv.writer(new_movies_file)
-posters_map = {}
-score_map = {}
-with open("parse_files/posters.csv", "r", encoding='UTF-8') as posters:
-    posters_reader = csv.reader(posters)
-    next(posters_reader)
-    for poster in posters_reader:
-        posters_map[poster[0]] = poster[1]
+# new_movies_file = open("parse_files/new_movies.csv", "w", encoding='UTF-8')
+# new_movies_file_writer = csv.writer(new_movies_file)
+# posters_map = {}
+# score_map = {}
+# with open("parse_files/posters.csv", "r", encoding='UTF-8') as posters:
+#     posters_reader = csv.reader(posters)
+#     next(posters_reader)
+#     for poster in posters_reader:
+#         posters_map[poster[0]] = poster[1]
+#
+# with open("parse_files/avg_ratings.csv", "r", encoding='UTF-8') as score:
+#     score_reader = csv.reader(score)
+#     next(score_reader)
+#     for score in score_reader:
+#         score_map[score[1]] = score[0]
+#
+# with open("parse_files/movies_metadata.csv", "r", encoding='UTF-8') as movies:
+#     movies_reader = csv.reader(movies)
+#     header = next(movies_reader)
+#     header.append("score")
+#     new_movies_file_writer.writerow(header)
+#     for movie in movies_reader:
+#         if len(movie) != 24:
+#             continue
+#         movie_id = movie[5]
+#         if posters_map.__contains__(movie_id):
+#             movie[11] = posters_map[movie_id]
+#         if score_map.__contains__(movie_id):
+#             movie.append(score_map[movie_id])
+#         else:
+#             movie.append(0)
+#         new_movies_file_writer.writerow(movie)
 
-with open("parse_files/avg_ratings.csv", "r", encoding='UTF-8') as score:
-    score_reader = csv.reader(score)
-    next(score_reader)
-    for score in score_reader:
-        score_map[score[1]] = score[0]
+def exclude_invalid_data(original, new, compare, id_index):
+    new_file = open(new, "w", encoding='UTF-8')
+    new_writer = csv.writer(new_file)
+    with open(original, "r", encoding='UTF-8') as olds:
+        olds_reader = csv.reader(olds)
+        new_writer.writerow(next(olds_reader))
+        for old in olds_reader:
+            old_id = old[id_index]
+            if compare.__contains__(old_id):
+                new_writer.writerow(old)
 
-with open("parse_files/movies_metadata.csv", "r", encoding='UTF-8') as movies:
+
+new_ratings_file = open("parse_files/new_ratings.csv", "w", encoding='UTF-8')
+new_ratings_writer = csv.writer(new_ratings_file)
+new_casts_relations_file = open("new/new_casts_relations.csv", "w", encoding='UTF-8')
+new_casts_relations_writer = csv.writer(new_casts_relations_file)
+
+user_ids = []
+movie_ids = []
+with open("parse_files/new_movies.csv", "r", encoding='UTF-8') as movies:
     movies_reader = csv.reader(movies)
-    header = next(movies_reader)
-    header.append("score")
-    new_movies_file_writer.writerow(header)
+    next(movies_reader)
     for movie in movies_reader:
-        if len(movie) != 24:
-            continue
-        movie_id = movie[5]
-        if posters_map.__contains__(movie_id):
-            movie[11] = posters_map[movie_id]
-        if score_map.__contains__(movie_id):
-            movie.append(score_map[movie_id])
-        else:
-            movie.append(0)
-        new_movies_file_writer.writerow(movie)
+        movie_ids.append(movie[5])
+
+with open("parse_files/user.csv", "r", encoding='UTF-8') as users:
+    users_reader = csv.reader(users)
+    next(users_reader)
+    for user in users_reader:
+        user_ids.append(user[0])
+
+with open("parse_files/ratings_merged.csv", "r", encoding='UTF-8') as ratings:
+    ratings_reader = csv.reader(ratings)
+    new_ratings_writer.writerow(next(ratings_reader))
+    for rating in ratings_reader:
+        movie_id = rating[1]
+        user_id = rating[0]
+        if user_ids.__contains__(user_id) and movie_ids.__contains__(movie_id):
+            new_ratings_writer.writerow(rating)
+
+exclude_invalid_data("relations/casts_relation.csv", "new/new_casts_relations.csv", movie_ids, 0)
+exclude_invalid_data("relations/crews_relation.csv", "new/new_crews_relations.csv", movie_ids, 0)
+exclude_invalid_data("relations/genres_relation.csv", "new/new_genres_relations.csv", movie_ids, 0)
+exclude_invalid_data("relations/keywords_relation.csv", "new/new_keywords_relations.csv", movie_ids, 0)
+exclude_invalid_data("relations/production_companies_relation.csv", "new/new_production_companies_relation.csv",
+                     movie_ids, 0)
+exclude_invalid_data("relations/production_countries_relation.csv", "new/new_production_countries_relation.csv",
+                     movie_ids, 0)
+exclude_invalid_data("relations/spoken_languages_relation.csv", "new/new_spoken_languages_relation.csv",
+                     movie_ids, 0)

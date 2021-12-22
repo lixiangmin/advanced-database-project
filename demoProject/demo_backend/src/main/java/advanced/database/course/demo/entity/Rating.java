@@ -6,20 +6,20 @@ import java.util.Objects;
 @Entity
 @Table(name = "rating")
 public class Rating {
-    private Double rating;
+    private Double score;
     private Long timestamp;
     private int ratingId;
     private int userId;
     private int movieId;
 
     @Basic
-    @Column(name = "rating")
-    public Double getRating() {
-        return rating;
+    @Column(name = "score")
+    public Double getScore() {
+        return score;
     }
 
-    public void setRating(Double rating) {
-        this.rating = rating;
+    public void setScore(Double rating) {
+        this.score = rating;
     }
 
     @Basic
@@ -48,13 +48,13 @@ public class Rating {
         if (o == null || getClass() != o.getClass()) return false;
         Rating that = (Rating) o;
         return ratingId == that.ratingId &&
-                Objects.equals(rating, that.rating) &&
+                Objects.equals(score, that.score) &&
                 Objects.equals(timestamp, that.timestamp);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(rating, timestamp, ratingId);
+        return Objects.hash(score, timestamp, ratingId);
     }
 
     @Basic
