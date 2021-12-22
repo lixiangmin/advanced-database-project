@@ -191,8 +191,6 @@ create table if not exists movie_keyword
   default charset = utf8
   AUTO_INCREMENT = 1;
 
-create index movie_id_index
-    on rating (movie_id);
+create index movie_id_index on rating (movie_id);
 
-create index user_id_index
-    on rating (user_id);
+create index user_id_index on rating (user_id);

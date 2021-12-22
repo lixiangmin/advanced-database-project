@@ -29,9 +29,6 @@ public class MovieServiceImpl implements MovieService {
     @Autowired
     private MovieRepository movieRepository;
 
-    @Autowired
-    private RatingRepository ratingRepository;
-
     @Override
     public void save(Movie movie) {
         movieRepository.save(movie);
@@ -63,68 +60,6 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public List<Movie> getRecommendsById(Integer id) {
-        int targetNum = 6;
-        List<Rating> ratings = ratingRepository.findByMovieId(id);
-        Collections.sort(ratings, (Comparator<Rating>) (o1, o2) -> o2.getScore().compareTo(o1.getScore()));
-        int end = Math.min(ratings.size(), 100);
-        ratings = ratings.subList(0, end);
-        HashMap<Integer, Integer> maps = new HashMap<>();
-        for (Rating rating : ratings) {
-            List<Rating> userMovies = ratingRepository.findByUserId(rating.getUserId());
-            for (Rating userMovie : userMovies) {
-                int movieId = userMovie.getMovieId();
-                if (maps.containsKey(movieId)) {
-                    maps.put(movieId, maps.get(movieId) + 1);
-                } else {
-                    maps.put(movieId, 1);
-                }
-            }
-        }
-        List<Map.Entry<Integer, Integer>> list = new ArrayList<Map.Entry<Integer, Integer>>(maps.entrySet());
-        Collections.sort(list, new Comparator<Map.Entry<Integer, Integer>>() {
-            public int compare(Map.Entry<Integer, Integer> o1,
-                               Map.Entry<Integer, Integer> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
-        List<Movie> movies = new ArrayList<>();
-        int index = 0;
-        while (movies.size() < targetNum && index < list.size()) {
-            int movieId = list.get(index).getKey();
-            if (movieId == id) {
-                index += 1;
-                continue;
-            }
-            Movie movie = movieRepository.findOneById(movieId);
-            if (movie == null) {
-                index += 1;
-                continue;
-            }
-            movies.add(movie);
-            index += 1;
-        }
-        if (movies.size() < targetNum) {
-            Movie movie = movieRepository.findOneById(id);
-            Set<Genre> genres = movie.getGenres();
-            for (Genre genre : genres) {
-                List<Movie> genreMovies = new ArrayList<>();
-                genreMovies.addAll(genre.getMovies());
-                Collections.shuffle(genreMovies);
-                for (Movie m : genreMovies) {
-                    if (id == m.getId())
-                        continue;
-                    movies.add(m);
-                    if (movies.size() == targetNum) {
-                        return movies;
-                    }
-                }
-            }
-        }
-        return movies;
-    }
-
-    @Override
     public Page<Movie> searchMoviesByText(String text, Pageable pageable) {
         return movieRepository.searchMoviesByText(text, pageable);
     }
@@ -136,7 +71,17 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public Page<Movie> searchMoviesByMovieId(int movieId, Pageable pageRequest) {
-        return movieRepository.searchMoviesByMovieId(movieId, pageRequest);
+        Page<Movie> page = movieRepository.searchMoviesByMovieId(movieId, pageRequest);
+        if (page.getTotalElements() == 0) {
+            Movie movie = movieRepository.findOneById(movieId);
+            Set<Genre> genres = movie.getGenres();
+            if (genres.size() > 0) {
+                List<Genre> genreList = new ArrayList<>();
+                genreList.addAll(genres);
+                return movieRepository.searchMoviesByGenreId(genreList.get(0).getId(), pageRequest);
+            }
+        }
+        return page;
     }
 
 }

@@ -32,8 +32,6 @@ public interface MovieService {
 
     List<Movie> findRecommendMovies();
 
-    List<Movie> getRecommendsById(Integer id);
-
     Page<Movie> searchMoviesByText(String text, Pageable pageRequest);
 
     Page<Movie> searchMoviesByGenreId(int type, Pageable pageRequest);

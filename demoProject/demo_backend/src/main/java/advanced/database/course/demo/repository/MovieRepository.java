@@ -27,17 +27,18 @@ public interface MovieRepository extends JpaRepository<Movie, Integer> {
     @Query(nativeQuery = true, value = "select * from movie where movie.score is not null order by movie.score DESC limit 9")
     List<Movie> findRecommendMovies();
 
-    @Query(nativeQuery = true, value = "select * from movie where movie.title like %:text% or movie.original_title like  %:text% or movie.overview like %:text%")
+    @Query(nativeQuery = true, value = "select * from movie where movie.title like %:text% or movie.original_title like  %:text% or movie.overview like %:text% order by movie.score DESC")
     Page<Movie> searchMoviesByText(@Param("text") String text, Pageable pageable);
 
-    @Query(nativeQuery = true, value = "select * from (select genre_id,movie_id  from `movie_genre` inner join genre on movie_genre.genre_id = genre.id ) t1 inner join movie on t1.movie_id = movie.id WHERE t1.genre_id = :genreId group by movie.id")
+    @Query(nativeQuery = true, value = "select * from (select genre_id,movie_id  from `movie_genre` inner join genre on movie_genre.genre_id = genre.id ) t1 " +
+            "inner join movie on t1.movie_id = movie.id WHERE t1.genre_id = :genreId group by movie.id order by movie.score DESC")
     Page<Movie> searchMoviesByGenreId(@Param("genreId") int genreId, Pageable pageable);
 
     @Query(nativeQuery = true, value = "select * from " +
             "(select movie_id FROM " +
-            "(select user_id,score from `rating` where movie_id = :movieId ) `t1` " +
+            "(select user_id from `rating` where movie_id = :movieId limit 20) `t1` " +
             "inner join `rating` on `rating`.user_id = `t1`.user_id) `t2` " +
-            "inner join `movie` on `movie`.id = `t2`.movie_id group by `movie`.id order by `movie`.score DESC")
+            "inner join `movie` on `movie`.id = `t2`.movie_id where `movie`.id != :movieId group by `movie`.id order by `movie`.score DESC")
     Page<Movie> searchMoviesByMovieId(@Param("movieId") int movieId, Pageable pageRequest);
 }
 

@@ -39,7 +39,7 @@ public class MovieController {
     public ResponseEntity<?> getRecommends(@PathVariable Integer id) {
         Map<Object, Object> result = new HashMap<>();
         result.put("msg", "Success");
-        result.put("recommends", movieService.getRecommendsById(id));
+        result.put("recommends", movieService.searchMoviesByMovieId(id, PageRequest.of(0, 6)).getContent());
         result.put("code", 0);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -155,6 +155,7 @@ public class MovieController {
         result.put("code", 0);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
     @GetMapping("/getKeywords")
     public ResponseEntity<?> getKeywords(@RequestParam("id") Integer id) {
         Map<Object, Object> result = new HashMap<>();
